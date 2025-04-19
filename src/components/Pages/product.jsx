@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Authlayout from "../Layouts/AuthLayout";
-import { getCourseSections } from "../../data";
 import CardItems from "../Fragments/CardItems";
 import { BannerContent } from "../Fragments/Content";
 import { Card } from "../Elements/card";
@@ -14,8 +13,7 @@ import useTutor from "../../hooks/useTutor";
 const token = localStorage.getItem("token");
 const ProductPage = () => {
     const {id} = useParams();
-    const [courseSections,setCourseSections] = useState([]);
-    const { selectedClass } = useClass("",id);
+    const { selectedClass, classLessons, classFacilities } = useClass("",id);
     const { limitedClass } = useClass("",id,3);
     const { tutorData } = useTutor(id);
 
@@ -23,7 +21,6 @@ useEffect(() => {
     if(token === null) {
         window.location.href = "/login";
     }
-    setCourseSections(getCourseSections());
 }, []);
 
 const [openIndex, setOpenIndex] = useState(0);
@@ -83,7 +80,7 @@ const strLimit = (str, limit) => {
                     )}
                     <Card varian="md:mr-4">
                         <H1>Kamu akan Mempelajari</H1><br />
-                        {courseSections.map((section, index) => (
+                        {classLessons.map((section, index) => (
                             <div key={index} className="mb-4">
                             {/* Section Header */}
                             <button
@@ -109,14 +106,14 @@ const strLimit = (str, limit) => {
                                     >
                                     <div className="grid grid-cols-12 ...">
                                         <div className="col-span-9">
-                                            {lesson.title}
+                                            {lesson.name}
                                         </div>
                                         <div className="col-span-3 flex justify-end hidden md:block">
                                             <div className="flex items-center gap-1">
                                                 <img src="../assets/play.svg" alt="" />
                                                 <span className="text-sm text-gray-800">Video</span>
                                                 <img src="../assets/clock.svg" alt="" />
-                                                <span className="text-sm text-gray-500">{lesson.duration}</span>
+                                                <span className="text-sm text-gray-500">{lesson.duration} menit</span>
                                             </div>
                                         </div>
                                     </div>
@@ -131,7 +128,7 @@ const strLimit = (str, limit) => {
                 </div>
                 <div className="col-span-1 ... mx-2 sm:mx-0 order-1 md:order-2">
                     {selectedClass && (
-                        <ItemSpesification isDetail={false} data={selectedClass} id={id} />
+                        <ItemSpesification isDetail={false} data={selectedClass} id={id} facilities={classFacilities} />
                     )}
                 </div>
             </div>

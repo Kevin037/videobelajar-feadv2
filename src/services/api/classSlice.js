@@ -1,21 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { classFilterData, getDataById, parseFirestoreFields, retrieveData } from "../db";
+import { getFacilities } from '../../data';
 
 const initialState = {
   selectedClass:null,
+  classLessons: [],
   classData: [],
+  classFacilities: [],
   loading: false,
   error: null,
 };
-
-// export const getClasses = createAsyncThunk('users/fetch', async (filterGroup, thunkAPI) => {
-//   try {
-//     const data = await retrieveData('classes', filterGroup);
-//     return data;
-//   } catch (error) {
-//     return thunkAPI.rejectWithValue(error.message);
-//   }
-// });
 
 export const getClasses = createAsyncThunk(
   'class/fetch',
@@ -34,9 +28,39 @@ export const fetchClassById = createAsyncThunk(
   async (id, thunkAPI) => {
     try {
       const res = await getDataById(id, 'classes');
-      return res;
+      const lessons = await retrieveData('lessons', id, "class_id");
+
+      // Group lessons by group_name
+      const groupedLessons = lessons.reduce((acc, lesson) => {
+        const groupName = lesson.group_name || "Ungrouped";
+
+        if (!acc[groupName]) {
+          acc[groupName] = [];
+        }
+
+        acc[groupName].push(lesson); // simpan seluruh objek lesson
+
+        return acc;
+      }, {});
+
+      // Convert grouped object to array
+      const classSections = Object.entries(groupedLessons).map(([groupName, lessons]) => ({
+        title: groupName,
+        lessons: lessons,
+      }));
+
+      const classData = parseFirestoreFields(res.fields);
+      const updatedFacilities = getFacilities().map((item) => ({
+        ...item,
+        value: classData?.[item.key] ?? null
+      }));
+      return {
+        classData: classData,
+        classSections: classSections,
+        classFacilities: updatedFacilities
+      };
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+    return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
@@ -85,7 +109,9 @@ const classSlice = createSlice({
       })
       .addCase(fetchClassById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedClass = parseFirestoreFields(action.payload.fields);
+        state.selectedClass = action.payload.classData;
+        state.classLessons = action.payload.classSections;
+        state.classFacilities = action.payload.classFacilities;
       })
       .addCase(fetchClassById.rejected, (state, action) => {
         state.loading = false;

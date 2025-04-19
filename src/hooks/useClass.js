@@ -4,7 +4,7 @@ import { fetchClassById, getClasses, getClassesFilter } from '../services/api/cl
 
 const useClass = (type=null,id=null,limit=0,ClassType = null, price = null, duration = null, keyword = null, ordering = null) => {
   const dispatch = useDispatch();
-  const {classData, selectedClass} = useSelector((state) => state.class);
+  const {classData, selectedClass, classLessons, classFacilities} = useSelector((state) => state.class);
   const limitedClass = classData.slice(0,limit);
   const loading = useSelector(state => state.class.loading);
   const error = useSelector(state => state.class.error);
@@ -21,7 +21,7 @@ const useClass = (type=null,id=null,limit=0,ClassType = null, price = null, dura
     }
   }, [dispatch,type, ClassType, price, duration, keyword, ordering,id]);
 
-  return { classData, loading, error, selectedClass, limitedClass};
+  return { classData, loading, error, selectedClass, limitedClass, classLessons, classFacilities};
 };
 
 export default useClass;

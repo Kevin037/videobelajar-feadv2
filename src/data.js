@@ -167,27 +167,27 @@ const courseSections = [
 
   const facilities = [
     {
-        id:1,
+        key:"final_test",
         img:"check.svg",
         name:"Ujian Akhir"
     },
     {
-        id:2,
+        key:"total_video",
         img:"video.svg",
-        name:"49 Video"
+        name:"Video"
     },
     {
-        id:3,
+        key:"total_document",
         img:"document.svg",
-        name:"7 Dokumen"
+        name:"Dokumen"
     },
     {
-        id:4,
+        key:"certificate",
         img:"certificate.svg",
         name:"Sertifikat"
     },
     {
-        id:5,
+        key:"pretest",
         img:"pretest.svg",
         name:"Pretest"
     }

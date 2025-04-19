@@ -1,15 +1,10 @@
-import { useEffect, useState } from "react";
-import { formatNumberToK, getFacilities } from "../../data";
+import { formatNumberToK } from "../../data";
 import { Card } from "../Elements/card";
 import { H1, H2 } from "../Elements/heading";
 import { ButtonPrimary } from "../Elements/button";
 
 export const ItemSpesification = (props) => {
-    const {isDetail,data,id} = props
-    const [facilities,setFacilities] = useState([]);
-    useEffect(() => {
-        setFacilities(getFacilities());
-    }, []);
+    const {isDetail,data,id,facilities} = props
     return (
         <Card varian="md:mr-4 p-4">
             {isDetail &&
@@ -38,18 +33,22 @@ export const ItemSpesification = (props) => {
             <H2 varian="mt-4">Kelas Ini Sudah Termasuk</H2>
             <div className="grid grid-cols-2 ...">
                 {facilities.length > 0 && facilities.map((facility) => (
-                    <div className="col-span-1 ... mt-3" key={facility.id}>
+                    (facility.value) && (
+                        <>
+                        <div className="col-span-1 ... mt-3" key={facility.id}>
                         <div className="grid grid-cols-4 ...">
                             <div className="col-span-1 ..."><img src={`../assets/`+facility.img} alt="" /></div>
-                            <div className="col-span-3 ..."><p>{facility.name}</p></div>
+                            <div className="col-span-3 ..."><p>{facility.value} {facility.name}</p></div>
                         </div>
                     </div>
+                        </>
+                    )
                 ))}
             </div>
             <H2 varian="mt-4">Bahasa Pengantar</H2>
             <div className="grid grid-cols-8 ...">
                 <div className="col-span-1 ..."><img src="../assets/bahasa.svg" alt="" /></div>
-                <div className="col-span-7 ..."><p>Bahasa Indonesia</p></div>
+                <div className="col-span-7 ..."><p>{data?.language}</p></div>
             </div>
         </Card>
     )
