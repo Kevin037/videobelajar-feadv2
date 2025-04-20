@@ -90,13 +90,13 @@ export const ClassCard = (props) => {
                                 <ButtonWhiteMD varian="mx-1">Unduh Sertifikat</ButtonWhiteMD>
                             </div>
                             <div className={`text-center md:text-right col-span-12 md:col-span-3 mt-2 md:mt-0`}>
-                                    <ButtonPrimaryMD varian="mx-1">Lihat Detail Kelas</ButtonPrimaryMD>
+                                    <ButtonPrimaryMD url={`/class/${order.class_id}`} varian="mx-1">Lihat Detail Kelas</ButtonPrimaryMD>
                             </div>
                         </>
                     )}
                     {(order.class_status == "in_progress") && (
                         <div className={`text-center md:text-right col-span-12 md:col-span-4 mt-4 md:mt-0`}>
-                            <ButtonPrimaryMD varian="">Lanjutkan Pembelajaran</ButtonPrimaryMD>  
+                            <ButtonPrimaryMD url={`/class/${order.class_id}`}>Lanjutkan Pembelajaran</ButtonPrimaryMD>  
                         </div>
                     )}
                 </>

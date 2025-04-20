@@ -16,6 +16,7 @@ import ClassPage from './components/Pages/classes.jsx'
 import { store } from './services/store.js'
 import { Provider } from 'react-redux';
 import CategoryPage from './components/Pages/category.jsx'
+import MyClassPage from './components/Pages/class.jsx'
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
   {
     path: '/category',
     element: <CategoryPage/>
+  },
+  {
+    path: '/class/:id/:lessonId?',
+    element: <MyClassPage/>
   }
 ])
 

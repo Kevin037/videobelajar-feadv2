@@ -9,7 +9,7 @@ function classNames(...classes) {
 
 const user_photo = localStorage.getItem("user_photo");
 const Authlayout = (props) => {
-    const {children, navType, withFooter, varianHead, style, customHead=""} = props
+    const {children, navType, withFooter, varianHead, style, customHead="", mainLayout=false, customLogo="", userPhoto=true} = props
     const handleLogout = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -34,6 +34,12 @@ const Authlayout = (props) => {
             </div>
             <div className="flex flex-1 items-center sm:items-stretch">
               <div className="flex shrink-0 items-center">
+                {customLogo != "" ? (
+                  <div>
+                    {customLogo}
+                  </div>
+                ) : (
+                <div>
                 <Link to="/">
                 <img
                   alt="Your Company"
@@ -41,11 +47,13 @@ const Authlayout = (props) => {
                   className="h-8 w-auto"
                 />
                 </Link>
+                </div>
+                )}
               </div>
             </div>
-            {(navType != "auth" && customHead == "")  ?
-            (
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              {(navType != "auth" && customHead == "")  ?
+            (
               <a
                   key="kategori"
                   href="/category"
@@ -56,7 +64,13 @@ const Authlayout = (props) => {
               >
               Kategori
               </a>
+            ) : (
+              <div className='hidden md:block'>
+                {customHead}
+              </div>
+            )}
                 {/* Profile dropdown */}
+                {userPhoto && (
                 <Menu as="div" className="relative ml-3 hidden sm:block">
                   <div>
                     <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
@@ -78,25 +92,45 @@ const Authlayout = (props) => {
                     </MenuButton>
                   </div>
                   <MenuItems
-                    transition
-                    className="absolute right-0 z-10 mt-2 w-24 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                  >
-                    <MenuItem>
-                      <Button
-                        onClick={handleLogout}
-                        className="block px-4 py-2 w-full text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden cursor-pointer"
-                      >
-                        Sign out
-                      </Button>
-                    </MenuItem>
-                  </MenuItems>
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                >
+                  <MenuItem>
+                    <Button
+                      onClick={() => {window.location.href = "/profile"}}
+                      className="block px-4 py-2 w-full text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden cursor-pointer"
+                    >
+                      Profile
+                    </Button>
+                  </MenuItem>
+                  <MenuItem>
+                    <Button
+                      onClick={() => {window.location.href = "/classes"}}
+                      className="block px-4 py-2 w-full text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden cursor-pointer"
+                    >
+                      Kelas Saya
+                    </Button>
+                  </MenuItem>
+                  <MenuItem>
+                    <Button
+                      onClick={() => {window.location.href = "/orders"}}
+                      className="block px-4 py-2 w-full text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden cursor-pointer"
+                    >
+                      Pesanan Saya
+                    </Button>
+                  </MenuItem>
+                  <MenuItem>
+                    <Button
+                      onClick={handleLogout}
+                      className="block px-4 py-2 w-full text-sm text-gray-700 data-focus:bg-gray-100 data-focus:outline-hidden cursor-pointer"
+                    >
+                      Sign out
+                    </Button>
+                  </MenuItem>
+                </MenuItems>
                 </Menu>
+              )}
               </div>
-            ) : (
-              <div className='hidden md:block'>
-                {customHead}
-              </div>
-            )}
           </div>
         </div>
   
@@ -140,9 +174,15 @@ const Authlayout = (props) => {
           </div>
         </DisclosurePanel>
       </Disclosure>
-      <div className="content" style={style}>
-      {children}
-      </div>
+      {mainLayout == true ? (
+        <div className="" style={style}>
+        {children}
+        </div>
+      ) : (
+        <div className="content" style={style}>
+        {children}
+        </div>
+      )}
       {withFooter == true && <Footer />}
       </>
     )
