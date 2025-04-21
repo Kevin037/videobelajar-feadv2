@@ -168,6 +168,42 @@ function buildFirestoreFields(data) {
     return response.data;
   }
 
+  export async function logOutSession() {
+    const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents:runQuery`;
+    const token = localStorage.getItem("token");
+    const query = {
+      structuredQuery: {
+        from: [{ collectionId: "sessions" }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: "access_token" },
+            op: "EQUAL",
+            value: { stringValue: token }
+          }
+        }
+      }
+    };
+  
+    try {
+      // 1. Cari dokumen yang punya token tersebut
+      const res = await api.post(endpoint, query);
+  
+      const foundDoc = res.data.find((doc) => doc.document?.name);
+      if (!foundDoc) throw new Error("Session not found.");
+  
+      const docName = foundDoc.document.name;
+      // 2. Hapus dokumen tersebut
+      await api.delete(docName);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("user_photo");
+      return true;
+    } catch (err) {
+      console.error("Failed to delete session:", err.message);
+      return false;
+    }
+  }
+
   export async function update(data, collectionName, documentId) {
     const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}/${documentId}`;
   

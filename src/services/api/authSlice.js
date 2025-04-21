@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser } from "../db";
+import { loginUser, logOutSession, store } from "../db";
 
 export const loginUserThunk = createAsyncThunk(
   "user/login",
@@ -7,6 +7,12 @@ export const loginUserThunk = createAsyncThunk(
     try {
       const user = await loginUser(credentials);
       const token = btoa(JSON.stringify({ email: user.email, time: new Date() }));
+      await store({
+        user_id: user.id,
+        access_token: token,
+        device: navigator.userAgent,
+        created_at: new Date().toISOString(),
+      },'sessions');
       localStorage.setItem("user", user.id);
       if (user.photo != null) {
         localStorage.setItem("user_photo", user.photo); 
@@ -19,12 +25,25 @@ export const loginUserThunk = createAsyncThunk(
   }
 );
 
+export const logOutuserThunk = createAsyncThunk(
+  'lessons/deleteLesson',
+async (thunkAPI) => {
+    try {
+      const logout = await logOutSession();
+      return logout;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
     loading: false,
-    error: null
+    error: null,
+    status:false
   },
   reducers: {
     logout: (state) => {
@@ -44,6 +63,19 @@ const authSlice = createSlice({
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(logOutuserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logOutuserThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.status = true;  
+      })
+      .addCase(logOutuserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.status = false;
       });
   }
 });

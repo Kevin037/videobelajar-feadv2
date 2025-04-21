@@ -2,6 +2,8 @@ import { Button, Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import Footer from "../Fragments/Footer";
 import { Link } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
+import { useEffect } from 'react';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -10,12 +12,16 @@ function classNames(...classes) {
 const user_photo = localStorage.getItem("user_photo");
 const Authlayout = (props) => {
     const {children, navType, withFooter, varianHead, style, customHead="", mainLayout=false, customLogo="", userPhoto=true} = props
+    const {logOut, status} = useAuth();
     const handleLogout = () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("user_photo");
-      window.location.href = "/login";
+      logOut();
     }
+
+    useEffect(() => {
+      if (status) {
+        window.location.href = "/login";
+      }
+    }, [status]);
     
     return (
         <>
