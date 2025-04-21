@@ -60,7 +60,7 @@ const strLimit = (str, limit) => {
     >
         <div className="border-t border-gray-200 flex flex-col">
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
-                <div className="col-span-7 ... pb-20">
+                <div className="col-span-1 md:col-span-7 ... sm:pb-0 md:pb-20">
                     <VideoPlayer />
                     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
                         <H1>Praktikkan Skill dengan Technical Book</H1>
@@ -80,8 +80,22 @@ const strLimit = (str, limit) => {
                         </div>
                     </div>
                 </div>
-                <div className="col-span-5 ... border-l border-gray-300">
-                    <div className="overflow-y-scroll h-screen pb-4">
+                <div className="cols-span-1 flex flex-col block md:hidden my-8">
+                    <div className={`left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
+                        {beforeLesson && (
+                            <button className="flex items-center gap-2 hover:opacity-70 cursor-pointer" onClick={() => {window.location.href = `/class/${id}/${beforeLesson?.id}`}}>
+                                <span className="text-xl">←</span> Sebelumnya
+                            </button>
+                        )}
+                        {afterLesson && (
+                            <button className="flex items-right gap-2 hover:opacity-70 cursor-pointer" onClick={() => {window.location.href = `/class/${id}/${afterLesson?.id}`}}>
+                                Selanjutnya <span className="text-xl">→</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div className="col-span-1 md:col-span-5 ... border-l border-gray-300">
+                    <div className="md:overflow-y-scroll md:h-130 pb-4 mb-15">
                     {(openIndex !== "" && classLessons.length > 0) && classLessons.map((section, index) => (
                         <div key={index} className="mb-4">
                         {/* Section Header */}
@@ -123,12 +137,12 @@ const strLimit = (str, limit) => {
                         </div>
                     ))}
                     </div>
-                    <div className="sticky bottom-13 w-full bg-orange-400 p-4 my-4 hover:opacity-80">
+                    <div className="fixed bottom-0 md:bottom-13 w-full bg-orange-400 p-4 mt-4 hover:opacity-80">
                         <Link to={`/class/${id}/facilities`} className="text-white flex gap-2"><img src="../assets/star.svg" alt="" /> Beri Review & Rating</Link>
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col hidden md:block">
                 {/* Footer navigasi tetap di bawah */}
                 <div className={`fixed bottom-0 left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
                     {beforeLesson && (
