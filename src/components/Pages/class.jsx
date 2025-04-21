@@ -12,7 +12,8 @@ const token = localStorage.getItem("token");
 const MyClassPage = () => {
     const {id,lessonId} = useParams();
     const { selectedClass, classLessons } = useClass("",id);
-    const { selectedLesson,beforeLesson,afterLesson } = useLesson(lessonId);
+    const lesson_id = lessonId ? lessonId : classLessons[0]?.lessons[0]?.id;
+    const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
 
 useEffect(() => {
     if(token === null) {
@@ -24,16 +25,9 @@ const [openIndex, setOpenIndex] = useState("");
 const [activeLesson, setActiveLesson] = useState("");
 
 useEffect(() => {
-    if (classLessons.length > 0) {
-        let title = classLessons[0].title;
-        let id = classLessons[0].lessons[0].id;
-        if (lessonId && selectedLesson) {
-            title = selectedLesson?.group_name;
-            id = lessonId;
-        }
-        
-        setOpenIndex(title);
-        setActiveLesson(id);
+    if (selectedLesson) {
+        setOpenIndex(selectedLesson?.group_name);
+        setActiveLesson(lesson_id);
     }
 }, [classLessons, selectedLesson]);
 
@@ -96,7 +90,7 @@ const strLimit = (str, limit) => {
                 </div>
                 <div className="col-span-1 md:col-span-5 ... border-l border-gray-300">
                     <div className="md:overflow-y-scroll md:h-130 pb-4 mb-15">
-                    {(openIndex !== "" && classLessons.length > 0) && classLessons.map((section, index) => (
+                    {(openIndex !== "" && classLessons.length > 0 && activeLesson) && classLessons.map((section, index) => (
                         <div key={index} className="mb-4">
                         {/* Section Header */}
                         <button
