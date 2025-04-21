@@ -3,16 +3,16 @@ import Authlayout from "../Layouts/AuthLayout";
 import { H1 } from "../Elements/heading";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import useClass from "../../hooks/useClass";
 import VideoPlayer from "../Fragments/Video";
 import ProgressPopover from "../Fragments/Progress";
 import useLesson from "../../hooks/useLesson";
+import useOrder from "../../hooks/useOrder";
 
 const token = localStorage.getItem("token");
 const MyClassPage = () => {
     const {id,lessonId} = useParams();
-    const { selectedClass, classLessons } = useClass("",id);
-    const lesson_id = lessonId ? lessonId : classLessons[0]?.lessons[0]?.id;
+    const { orderData, orderLessons } = useOrder(null,id,"order_id");
+    const lesson_id = lessonId ? lessonId : orderLessons[0]?.lessons[0]?.lesson_id;
     const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
 
 useEffect(() => {
@@ -29,7 +29,7 @@ useEffect(() => {
         setOpenIndex(selectedLesson?.group_name);
         setActiveLesson(lesson_id);
     }
-}, [classLessons, selectedLesson]);
+}, [orderLessons, selectedLesson]);
 
 const toggle = (index) => {
   setOpenIndex(openIndex === index ? null : index);
@@ -61,16 +61,16 @@ const strLimit = (str, limit) => {
                         <p>Pelajari dan praktikkan skill teknis dalam berbagai industri dengan Technical Book Riselearn</p>
                         <div className="my-2 grid grid-cols-3 grid-cols-12 ...">
                             <div className="col-span-1 ...">
-                                <img src={`/assets/${selectedClass?.avatar}`} alt="" />
+                                <img src={`/assets/${orderData[0]?.avatar}`} alt="" />
                             </div>
                             <div className="text-sm col-span-11 ...">
-                                <p><b>{selectedClass?.user}</b></p>
-                                <p>{selectedClass?.user_position} di {selectedClass?.user_company}</p>
+                                <p><b>{orderData[0]?.user}</b></p>
+                                <p>{orderData[0]?.user_position} di {orderData[0]?.user_company}</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
                             <img src="/assets/rating.svg"/>
-                            <p>{selectedClass?.rating} ({selectedClass?.total_selling})</p>
+                            <p>{orderData[0]?.rating} ({orderData[0]?.total_selling})</p>
                         </div>
                     </div>
                 </div>
@@ -90,9 +90,8 @@ const strLimit = (str, limit) => {
                 </div>
                 <div className="col-span-1 md:col-span-5 ... border-l border-gray-300">
                     <div className="md:overflow-y-scroll md:h-130 pb-4 mb-15">
-                    {(openIndex !== "" && classLessons.length > 0 && activeLesson) && classLessons.map((section, index) => (
+                    {(openIndex !== "" && orderLessons.length > 0 && activeLesson) && orderLessons.map((section, index) => (
                         <div key={index} className="mb-4">
-                        {/* Section Header */}
                         <button
                             onClick={() => toggle(section.title)}
                             className="w-full flex justify-between items-center font-semibold text-base focus:outline-none px-4 py-1"
@@ -106,14 +105,13 @@ const strLimit = (str, limit) => {
                             )}
                         </button>
 
-                        {/* Lessons */}
                         {openIndex === section.title && section.lessons.length > 0 && (
                             <div className="mt-3 space-y-2">
                             {section.lessons.map((lesson, i) => (
-                                <a key={i} href={`/class/${id}/${lesson.id}`} className="flex items-center">
+                                <a key={i} href={`/class/${id}/${lesson.lesson_id}`} className="flex items-center">
                                 <div
                                 key={i}
-                                className={`justify-between w-full ${activeLesson === lesson.id ? "bg-green-100" : "bg-white"} p-3 rounded-lg border border-gray-300 cursor-pointer hover:bg-green-50 mx-4`}
+                                className={`justify-between w-full ${activeLesson === lesson.lesson_id ? "bg-green-100" : "bg-white"} p-3 rounded-lg border border-gray-300 cursor-pointer hover:bg-green-50 mx-4`}
                                 >
                                     <div>
                                         <div className="flex items-center gap-1">
@@ -137,7 +135,6 @@ const strLimit = (str, limit) => {
                 </div>
             </div>
             <div className="flex flex-col hidden md:block">
-                {/* Footer navigasi tetap di bawah */}
                 <div className={`fixed bottom-0 left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
                     {beforeLesson && (
                         <button className="flex items-center gap-2 hover:opacity-70 cursor-pointer" onClick={() => {window.location.href = `/class/${id}/${beforeLesson?.id}`}}>

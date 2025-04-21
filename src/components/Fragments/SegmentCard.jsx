@@ -94,7 +94,7 @@ export const ClassCard = (props) => {
                     )}
                     {(order.class_status == "in_progress") && (
                         <div className={`text-center md:text-right col-span-12 md:col-span-4 mt-4 md:mt-0`}>
-                            <ButtonPrimaryMD url={`/class/${order.class_id}`}>Lanjutkan Pembelajaran</ButtonPrimaryMD>  
+                            <ButtonPrimaryMD url={`/class/${order.order_id}`}>Lanjutkan Pembelajaran</ButtonPrimaryMD>  
                         </div>
                     )}
                 </>

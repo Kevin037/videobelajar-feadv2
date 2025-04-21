@@ -3,6 +3,7 @@ import { getDataById, parseFirestoreFields, retrieveData, store, update } from "
 
 const initialState = {
   orderData: [],
+  orderLessons: [],
   currentOrder: null,
   loading: false,
   error: null,
@@ -54,7 +55,34 @@ export const getOrders = createAsyncThunk(
   async ({order_id,columnName,user_id}, thunkAPI) => {
     try {
       const data = await retrieveData('orders', order_id, columnName,user_id);
-      return data;
+      if (data[0]?.order_id) {
+        let orderLessons = [];
+        if (order_id != null && columnName != null) {
+          const lessons = await retrieveData('order_lessons', data[0].order_id, "order_id");
+          lessons.sort((a, b) => a.ordering - b.ordering);
+          const groupedLessons = lessons.reduce((acc, lesson) => {
+            const groupName = lesson.group_name || "Ungrouped";
+    
+            if (!acc[groupName]) {
+              acc[groupName] = [];
+            }
+    
+            acc[groupName].push(lesson); // simpan seluruh objek lesson
+    
+            return acc;
+          }, {});
+    
+          // Convert grouped object to array
+          orderLessons = Object.entries(groupedLessons).map(([groupName, lessons]) => ({
+            title: groupName,
+            lessons: lessons,
+          }));
+        }
+        return {
+          orderData: data,
+          orderLessons: orderLessons
+        } 
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -106,7 +134,8 @@ const orderSlice = createSlice({
       })
       .addCase(getOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orderData = action.payload;
+        state.orderData = action.payload.orderData;
+        state.orderLessons = action.payload.orderLessons;
       })
       .addCase(getOrders.rejected, (state, action) => {
         state.loading = false;

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 const useOrder = (id=null,order_id=null, columnName=null, user_id = null) => {
   const dispatch = useDispatch();
-  const { orderData, currentOrder, loading, error, status } = useSelector(state => state.order);
+  const { orderData, currentOrder, loading, error, status, orderLessons } = useSelector(state => state.order);
 
   const createOrder = (userData) => {
     dispatch(createOrderThunk(userData));
@@ -24,7 +24,7 @@ const useOrder = (id=null,order_id=null, columnName=null, user_id = null) => {
       }
     }, [dispatch,order_id]);
 
-  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status };
+  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status, orderLessons };
 };
 
 export default useOrder;

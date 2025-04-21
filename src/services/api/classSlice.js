@@ -29,7 +29,7 @@ export const fetchClassById = createAsyncThunk(
     try {
       const res = await getDataById(id, 'classes');
       const lessons = await retrieveData('lessons', id, "class_id");
-
+      lessons.sort((a, b) => a.ordering - b.ordering);
       // Group lessons by group_name
       const groupedLessons = lessons.reduce((acc, lesson) => {
         const groupName = lesson.group_name || "Ungrouped";
