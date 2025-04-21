@@ -9,6 +9,7 @@ import { TransactionNominal } from "../Fragments/TransactionNominal";
 import { CheckCircle, ChevronDown } from "lucide-react";
 import useOrder from "../../hooks/useOrder";
 import { useParams } from "react-router-dom";
+import useClass from "../../hooks/useClass";
 
 const token = localStorage.getItem("token");
 const ChangePaymentPage = () => {
@@ -17,6 +18,8 @@ const ChangePaymentPage = () => {
     const [openGroup, setOpenGroup] = useState("Transfer Bank");
     const [paymentMethod, setPaymentMethod] = useState("");
     const { currentOrder } = useOrder(id);
+    const class_id = currentOrder?.class_id;
+    const { classFacilities } = useClass("",class_id);
     const { updateOrder, status } = useOrder();
 
 useEffect(() => {
@@ -111,7 +114,7 @@ useEffect(() => {
                 </div>
                 <div className="col-span-1 ... mx-2 sm:mx-0 order-1 lg:order-2">
                     {currentOrder && (
-                        <ItemSpesification isDetail={true} data={currentOrder}/>
+                        <ItemSpesification isDetail={true} data={currentOrder} facilities={classFacilities}/>
                     )}
                 </div>
             </div>

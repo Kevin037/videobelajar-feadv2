@@ -29,8 +29,6 @@ export const SegmentCard = (props) => {
 
 export const ClassCard = (props) => {
     const {order} = props
-    console.log(order);
-    
     return (
         <>
         <SegmentCard 

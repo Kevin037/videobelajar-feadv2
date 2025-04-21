@@ -18,7 +18,7 @@ const CheckoutPage = () => {
     const [paytmentMethods,setPaytmentMethods] = useState([]);
     const [openGroup, setOpenGroup] = useState("Transfer Bank");
     const [paymentMethod, setpaymentMethod] = useState("");
-    const { selectedClass } = useClass("",id);
+    const { selectedClass, classFacilities } = useClass("",id);
     const [class_id] = useState(id);
 
     const { currentOrder, createOrder } = useOrder();
@@ -131,7 +131,7 @@ useEffect(() => {
                 </div>
                 <div className="col-span-1 ... mx-2 sm:mx-0 order-1 lg:order-2">
                 {selectedClass && (
-                    <ItemSpesification isDetail={true} data={selectedClass}/>
+                    <ItemSpesification isDetail={true} data={selectedClass} facilities={classFacilities} />
                 )}
                 </div>
             </div>

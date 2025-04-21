@@ -11,6 +11,7 @@ import { ChevronDown } from "lucide-react";
 import { PaymentTimer } from "../Fragments/PaymentTimer";
 import { useParams } from "react-router-dom";
 import useOrder from "../../hooks/useOrder";
+import useClass from "../../hooks/useClass";
 
 const token = localStorage.getItem("token");
 const PaymentPage = () => {
@@ -19,6 +20,8 @@ const PaymentPage = () => {
     const [openHowToPay, setOpenHowToPay] = useState("");
     const [howToPays, setHowToPays] = useState("");
     const { orderData } = useOrder(null,id,"order_id");
+    const class_id = orderData[0]?.class_id;
+    const { classFacilities } = useClass("",class_id);
     const { updateOrder, status } = useOrder();
 
     useEffect(() => {
@@ -95,7 +98,7 @@ const PaymentPage = () => {
                 </div>
                 <div className="col-span-1 ... mx-2 sm:mx-0 order-1 lg:order-2">
                     {orderData && (
-                     <ItemSpesification isDetail={true} data={orderData[0]}/>   
+                     <ItemSpesification isDetail={true} data={orderData[0]} facilities={classFacilities}/>   
                     )}
                 </div>
             </div>

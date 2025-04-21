@@ -14,7 +14,23 @@ export const createOrderThunk = createAsyncThunk(
   async (orderData, thunkAPI) => {
     try {
       const res = await store(orderData,'orders');
-      return res; // res berisi data document baru dari Firestore
+      if (res?.fields) {
+        const order = parseFirestoreFields(res.fields);
+        const lessons = await retrieveData('lessons', order.class_id, "class_id");
+          for (let i = 0; i < lessons.length; i++) {
+            await store({ 
+              order_id: order.order_id,
+              class_id: lessons[i].class_id,
+              lesson_id: lessons[i].id,
+              duration: lessons[i].duration,
+              group_name: lessons[i].group_name,
+              ordering: lessons[i].ordering,
+              name: lessons[i].name,
+              type: lessons[i].type
+            },'order_lessons');
+          }
+        return order;
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -79,7 +95,7 @@ const orderSlice = createSlice({
       })
       .addCase(createOrderThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentOrder = parseFirestoreFields(action.payload.fields); // data user baru dari Firestore
+        state.currentOrder = action.payload; // data user baru dari Firestore
       })
       .addCase(createOrderThunk.rejected, (state, action) => {
         state.loading = false;
