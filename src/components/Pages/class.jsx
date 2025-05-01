@@ -149,7 +149,7 @@ const strLimit = (str, limit) => {
                         <Link onClick={() => setModalOpen(true)} className="text-white flex gap-2"><img src="../assets/star.svg" alt="" /> Beri Review & Rating</Link>
                     </div>
                 </div>
-                <ModalReview isOpen={isModalOpen} onClose={() => setModalOpen(false)} id={orderData[0]?.id} />
+                <ModalReview isOpen={isModalOpen} user_rating={orderData[0]?.user_rating} onClose={() => setModalOpen(false)} id={orderData[0]?.id} />
             </div>
             <div className="flex flex-col hidden md:block">
                 <div className={`fixed bottom-0 left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>

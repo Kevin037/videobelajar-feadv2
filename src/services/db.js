@@ -187,6 +187,12 @@ export async function getDataById(id,collectionName) {
   return response.data;
 }
 
+export async function deleteDataById(id, collectionName) {
+  const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}/${id}`;
+  const response = await api.delete(endpoint);
+  return response.data;
+}
+
 function buildFirestoreFields(data) {
     const fields = {};
     Object.entries(data).forEach(([key, value]) => {

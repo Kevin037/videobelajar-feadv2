@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getDataById, parseFirestoreFields, retrieveData, store, update } from "../db";
+import { deleteDataById, getDataById, parseFirestoreFields, retrieveData, store, update } from "../db";
 
 const initialState = {
   orderData: [],
@@ -42,8 +42,17 @@ export const createReviewThunk = createAsyncThunk(
   'order/review',
   async (reviewData, thunkAPI) => {
     try {
+      const reviews = await retrieveData('reviews', reviewData.order_id,"order_id");
+      if (reviews.length > 0) {
+        for (let i = 0; i < reviews.length; i++) {
+          await deleteDataById(reviews[i].id,'reviews');
+        }
+      }
       const res = await store(reviewData,'reviews');
-      return res;
+      if (res) {
+        const order = await update({user_rating:reviewData.rating,user_review:reviewData.review},'orders',reviewData.order_id); 
+        return order;
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
