@@ -517,3 +517,16 @@ export const formatNumberToK = (num) => {
     }
     return parsedNum.toString();
   };
+
+  export const ucfirst = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+export const json_to_array = (json) => {
+    const answerArray = Object.entries(json).map(([key, value]) => ({
+        key,
+        value
+      }));
+    return answerArray;
+}

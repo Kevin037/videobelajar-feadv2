@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import Authlayout from "../Layouts/AuthLayout";
-import { H1 } from "../Elements/heading";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import VideoPlayer from "../Fragments/Video";
 import ProgressPopover from "../Fragments/Progress";
 import useLesson from "../../hooks/useLesson";
 import useOrder from "../../hooks/useOrder";
+import { ucfirst } from "../../data";
+import { ContentLessson } from "../Fragments/LessonSegment";
 
 const token = localStorage.getItem("token");
 const MyClassPage = () => {
-    const {id,lessonId} = useParams();
+    const {id,lessonId,no} = useParams();
     const { orderData, orderLessons } = useOrder(null,id,"order_id");
-    const lesson_id = lessonId ? lessonId : orderLessons[0]?.lessons[0]?.lesson_id;
+    const lesson_id = (lessonId  && !["pre-test","quiz"].includes(lessonId)) ? lessonId : orderLessons[0]?.lessons[0]?.lesson_id;
     const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
+    const { test, tests } = useLesson(null, id, lessonId, no);
 
 useEffect(() => {
     if(token === null) {
@@ -26,8 +27,10 @@ const [activeLesson, setActiveLesson] = useState("");
 
 useEffect(() => {
     if (selectedLesson) {
-        setOpenIndex(selectedLesson?.group_name);
-        setActiveLesson(lesson_id);
+        const openIndexActive = (["pre-test","quiz"].includes(lessonId)) ? lessonId : selectedLesson?.group_name;
+        setOpenIndex(openIndexActive);
+        const active = (["pre-test","quiz"].includes(lessonId)) ? lessonId : lesson_id;
+        setActiveLesson(active);
     }
 }, [orderLessons, selectedLesson]);
 
@@ -54,25 +57,11 @@ const strLimit = (str, limit) => {
     >
         <div className="border-t border-gray-200 flex flex-col">
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
-                <div className="col-span-1 md:col-span-7 ... sm:pb-0 md:pb-20">
-                    <VideoPlayer />
-                    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
-                        <H1>Praktikkan Skill dengan Technical Book</H1>
-                        <p>Pelajari dan praktikkan skill teknis dalam berbagai industri dengan Technical Book Riselearn</p>
-                        <div className="my-2 grid grid-cols-3 grid-cols-12 ...">
-                            <div className="col-span-1 ...">
-                                <img src={`/assets/${orderData[0]?.avatar}`} alt="" />
-                            </div>
-                            <div className="text-sm col-span-11 ...">
-                                <p><b>{orderData[0]?.user}</b></p>
-                                <p>{orderData[0]?.user_position} di {orderData[0]?.user_company}</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-3">
-                            <img src="/assets/rating.svg"/>
-                            <p>{orderData[0]?.rating} ({orderData[0]?.total_selling})</p>
-                        </div>
-                    </div>
+                <div className="col-span-1 md:col-span-8 ... sm:pb-0 md:pb-20">
+                    {orderData.length > 0 && (
+                        <ContentLessson orderData={orderData[0]} type={lessonId} classId={id} testNo={no} test={test} tests={tests}/>   
+                    )
+                    }
                 </div>
                 <div className="cols-span-1 flex flex-col block md:hidden my-8">
                     <div className={`left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
@@ -88,8 +77,22 @@ const strLimit = (str, limit) => {
                         )}
                     </div>
                 </div>
-                <div className="col-span-1 md:col-span-5 ... border-l border-gray-300">
+                <div className="col-span-1 md:col-span-4 ... border-l border-gray-300">
                     <div className="md:overflow-y-scroll md:h-130 pb-4 mb-15">
+                    <a  href={`/class/${id}/pre-test`} className="flex items-center mb-4 mt-3">
+                        <div
+                        className={`justify-between w-full ${activeLesson === "pre-test" ? "bg-green-100" : "bg-white"} p-3 rounded-lg border border-gray-300 cursor-pointer hover:bg-green-50 mx-4`}
+                        >
+                            <div>
+                                <div className="flex items-center gap-1">
+                                    <img src="../assets/lesson_test.svg" alt="" />
+                                    <span className="text-sm text-gray-800">pre-test: </span>
+                                    Introduction to {orderData[0]?.title}
+                                </div>
+                                <span className="text-sm text-gray-500 ml-6">10 Pertanyaan</span>
+                            </div>
+                        </div>
+                    </a>
                     {(openIndex !== "" && orderLessons.length > 0 && activeLesson) && orderLessons.map((section, index) => (
                         <div key={index} className="mb-4">
                         <button
@@ -116,7 +119,7 @@ const strLimit = (str, limit) => {
                                     <div>
                                         <div className="flex items-center gap-1">
                                             <img src="../assets/play.svg" alt="" />
-                                            <span className="text-sm text-gray-800">Video: </span>
+                                            <span className="text-sm text-gray-800">{ucfirst(lesson.type)}: </span>
                                             {lesson.name}
                                         </div>
                                         <span className="text-sm text-gray-500 ml-6">{lesson.duration} menit</span>
@@ -128,6 +131,20 @@ const strLimit = (str, limit) => {
                         )}
                         </div>
                     ))}
+                    <a  href={`/class/${id}/quiz`} className="flex items-center mb-4 mt-3">
+                        <div
+                        className={`justify-between w-full ${activeLesson === "quiz" ? "bg-green-100" : "bg-white"} p-3 rounded-lg border border-gray-300 cursor-pointer hover:bg-green-50 mx-4`}
+                        >
+                            <div>
+                                <div className="flex items-center gap-1">
+                                    <img src="../assets/lesson_test.svg" alt="" />
+                                    <span className="text-sm text-gray-800">Quiz: </span>
+                                    Introduction to {orderData[0]?.title}
+                                </div>
+                                <span className="text-sm text-gray-500 ml-6">10 Pertanyaan</span>
+                            </div>
+                        </div>
+                    </a>
                     </div>
                     <div className="fixed bottom-0 md:bottom-13 w-full bg-orange-400 p-4 mt-4 hover:opacity-80">
                         <Link to={`/class/${id}/facilities`} className="text-white flex gap-2"><img src="../assets/star.svg" alt="" /> Beri Review & Rating</Link>

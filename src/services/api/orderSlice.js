@@ -61,14 +61,15 @@ export const getOrders = createAsyncThunk(
           const lessons = await retrieveData('order_lessons', data[0].order_id, "order_id");
           lessons.sort((a, b) => a.ordering - b.ordering);
           const groupedLessons = lessons.reduce((acc, lesson) => {
-            const groupName = lesson.group_name || "Ungrouped";
+            if (lesson.type === "video") {
+              const groupName = lesson.group_name || "Ungrouped";
     
-            if (!acc[groupName]) {
-              acc[groupName] = [];
+              if (!acc[groupName]) {
+                acc[groupName] = [];
+              }
+      
+              acc[groupName].push(lesson); // simpan seluruh objek lesson
             }
-    
-            acc[groupName].push(lesson); // simpan seluruh objek lesson
-    
             return acc;
           }, {});
     

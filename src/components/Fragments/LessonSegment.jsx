@@ -1,0 +1,67 @@
+import VideoPlayer from "../Fragments/Video";
+import { H1 } from "../Elements/heading";
+import { ButtonPrimaryMD } from "../Elements/button";
+import QuestionLesson from "./QuestionSegment";
+import { ucfirst } from "../../data";
+import TestResult from "./ResultTestSegment";
+
+export const ContentLessson = (props) => {
+    const {orderData,type,classId,testNo,test,tests} = props
+    return (
+        <>
+        {testNo != null ? (
+            testNo === "result" ? (
+                <TestResult orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} />
+            ) : (
+                <QuestionLesson orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} />
+            )
+        ) : ['pre-test','quiz'].includes(type) ? (
+                    <TestLesson orderData={orderData} type={type} classId={classId} />
+                ) : (
+            <VideoLessson orderData={orderData} />
+        )}
+        </>
+    )
+}
+
+export const VideoLessson = (props) => {
+    const {orderData} = props
+    return (
+        <>
+            <VideoPlayer />
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
+                <H1>Praktikkan Skill dengan Technical Book</H1>
+                <p>Pelajari dan praktikkan skill teknis dalam berbagai industri dengan Technical Book Riselearn</p>
+                <div className="my-2 grid grid-cols-3 grid-cols-12 ...">
+                    <div className="col-span-1 ...">
+                        <img src={`/assets/${orderData?.avatar}`} alt="" />
+                    </div>
+                    <div className="text-sm col-span-11 ...">
+                        <p><b>{orderData?.user}</b></p>
+                        <p>{orderData?.user_position} di {orderData?.user_company}</p>
+                    </div>
+                </div>
+                <div className="flex gap-3">
+                    <img src="/assets/rating.svg"/>
+                    <p>{orderData?.rating} ({orderData?.total_selling})</p>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export const TestLesson = (props) => {
+    const {orderData,type,classId} = props
+    return (
+        <>
+            <img src="/assets/rules.svg" alt="" />
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
+                <H1>Aturan</H1>
+                <p className="my-2">Kerjakan {type} dengan sebaik mungkin untuk mengukur pemahaman awalmu terkait materi yang akan kamu pelajari</p>
+                <p className="my-2">Syarat Nilai Kelulusan: - <br />Durasi Ujian: 5 Menit</p>
+                <p className="my-2">Jangan khawatir, total skor tidak akan memengaruhi kelulusan dan penilaian akhirmu dalam rangkaian kelas ini</p>
+            <ButtonPrimaryMD url={`/class/${classId}/pre-test/1`} varian="mt-4">Mulai {ucfirst(type)}</ButtonPrimaryMD>
+            </div>
+        </>
+    )
+}

@@ -68,7 +68,7 @@ const router = createBrowserRouter([
     element: <CategoryPage/>
   },
   {
-    path: '/class/:id/:lessonId?',
+    path: '/class/:id/:lessonId?/:no?',
     element: <MyClassPage/>
   }
 ])

@@ -14,9 +14,10 @@ export const Button = (props) => {
 }
 
 export const ButtonTheme = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian,onClick} = props
   return (
     <Link 
+      onClick={onClick}
       className={`block text-center w-full py-2 rounded-theme transition ${varian}`} 
       to={url}
       >
@@ -76,10 +77,11 @@ export const ButtonPrimarySubmit = (props) => {
 }
 
 export const ButtonPrimary = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian,onClick} = props
   return (
     <ButtonTheme 
       url={url}
+      onClick={onClick}
       varian={`bg-green-500 hover:bg-green-600 text-white ${varian}`}>
     {children}
     </ButtonTheme>
@@ -143,10 +145,11 @@ export const ButtonYellow = (props) => {
 }
 
 export const ButtonSecondary = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian,onClick} = props
   return (
       <ButtonTheme 
         url={url}
+        onClick={onClick}
         varian={`bg-green-100 text-green-600 hover:bg-green-200 ${varian}`}>
       {children}
       </ButtonTheme>

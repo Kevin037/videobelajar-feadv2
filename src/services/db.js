@@ -56,6 +56,57 @@ export async function retrieveData(collectionName, filterGroup = null, columnNam
   return formatted;
 }
 
+export async function retrieveDataMultipleCondition(collectionName, filters = []) {
+  const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}`;
+
+  const response = await api.get(endpoint);
+
+  const documents = response.data.documents || [];
+
+  const formatted = documents.map((doc) => {
+    const id = doc.name.split('/').pop();
+    const fields = Object.entries(doc.fields || {}).reduce((acc, [key, val]) => {
+      const value = Object.values(val)[0]; // ambil isi stringValue/numberValue/dll
+      acc[key] = value;
+      return acc;
+    }, {});
+    return {
+      id,
+      ...fields
+    };
+  });
+
+  const filteredData = formatted.filter(item => {
+    // kalau filters kosong, return semua
+    if (filters.length === 0) return true;
+
+    // kalau ada filters, cek semua kondisi
+    return filters.every(filter => {
+      const { field, operator, value } = filter;
+
+      // implement basic operator
+      switch (operator) {
+        case '==':
+          return item[field] == value;
+        case '!=':
+          return item[field] != value;
+        case '>':
+          return item[field] > value;
+        case '<':
+          return item[field] < value;
+        case '>=':
+          return item[field] >= value;
+        case '<=':
+          return item[field] <= value;
+        default:
+          return false;
+      }
+    });
+  });
+
+  return filteredData;
+}
+
 export async function classFilterData(ClassType = null, price = null, duration = null, keyword = null, ordering = null) {
   const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents/classes`;
 
