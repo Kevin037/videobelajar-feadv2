@@ -88,11 +88,24 @@ export const ButtonPrimary = (props) => {
   );
 }
 
+export const ButtonDisabled = (props) => {
+  const {url, children, varian,onClick} = props
+  return (
+    <ButtonTheme 
+      url={url}
+      onClick={onClick}
+      varian={`text-white ${varian}`}>
+    {children}
+    </ButtonTheme>
+  );
+}
+
 export const ButtonPrimaryMD = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian, onClick} = props
   return (
     <Link 
       to={url}
+      onClick={onClick}
       className={`${varian} block md:inline-block bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition cursor-pointer`}>
     {children}
     </Link>
@@ -112,10 +125,11 @@ export const ButtonPrimaryMDSubmit = (props) => {
 }
 
 export const ButtonWhiteMD = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian,onClick} = props
   return (
     <Link 
       to={url}
+      onClick={onClick}
       className={`${varian} block md:inline-block bg-white-500 text-green-500 border px-4 py-2 rounded-lg hover:bg-white-600 transition cursor-pointer`}>
     {children}
     </Link>

@@ -52,7 +52,7 @@ const strLimit = (str, limit) => {
         customLogo={beforeLesson && (
             <a href={`/class/${id}/${beforeLesson?.id}`}><span className="text-xl">←</span> {strLimit(beforeLesson?.name, 60)}</a>
         )}
-        customHead={<ProgressPopover />}
+        customHead={<ProgressPopover id={orderData[0]?.id} progress={100} />}
         userPhoto={true}
     >
         <div className="border-t border-gray-200 flex flex-col">
