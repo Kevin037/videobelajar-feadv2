@@ -137,10 +137,11 @@ export const ButtonWhiteMD = (props) => {
 }
 
 export const ButtonWhite = (props) => {
-  const {url, children, varian} = props
+  const {url, children, varian,onClick} = props
   return (
     <ButtonTheme 
       url={url}
+      onClick={onClick}
       varian={`bg-white-500 border hover:bg-white-600 text-green-500 ${varian}`}>
     {children}
     </ButtonTheme>

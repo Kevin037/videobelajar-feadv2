@@ -7,6 +7,7 @@ import useLesson from "../../hooks/useLesson";
 import useOrder from "../../hooks/useOrder";
 import { ucfirst } from "../../data";
 import { ContentLessson } from "../Fragments/LessonSegment";
+import ModalReview from "../Fragments/ModalReview";
 
 const token = localStorage.getItem("token");
 const MyClassPage = () => {
@@ -15,6 +16,7 @@ const MyClassPage = () => {
     const lesson_id = (lessonId  && !["pre-test","quiz"].includes(lessonId)) ? lessonId : orderLessons[0]?.lessons[0]?.lesson_id;
     const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
     const { test, tests } = useLesson(null, id, lessonId, no);
+    const [isModalOpen, setModalOpen] = useState(false);
 
 useEffect(() => {
     if(token === null) {
@@ -144,9 +146,10 @@ const strLimit = (str, limit) => {
                     </a>
                     </div>
                     <div className="fixed bottom-0 md:bottom-13 w-full bg-orange-400 p-4 mt-4 hover:opacity-80">
-                        <Link to={`/class/${id}/facilities`} className="text-white flex gap-2"><img src="../assets/star.svg" alt="" /> Beri Review & Rating</Link>
+                        <Link onClick={() => setModalOpen(true)} className="text-white flex gap-2"><img src="../assets/star.svg" alt="" /> Beri Review & Rating</Link>
                     </div>
                 </div>
+                <ModalReview isOpen={isModalOpen} onClose={() => setModalOpen(false)} id={orderData[0]?.id} />
             </div>
             <div className="flex flex-col hidden md:block">
                 <div className={`fixed bottom-0 left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>

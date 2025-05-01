@@ -38,6 +38,18 @@ export const createOrderThunk = createAsyncThunk(
   }
 );
 
+export const createReviewThunk = createAsyncThunk(
+  'order/review',
+  async (reviewData, thunkAPI) => {
+    try {
+      const res = await store(reviewData,'reviews');
+      return res;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 export const updateOrderThunk = createAsyncThunk(
   'order/update',
   async ({id,orderData}, thunkAPI) => {
@@ -164,7 +176,19 @@ const orderSlice = createSlice({
       .addCase(getOrderById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(createReviewThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createReviewThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.status = true;
+      })
+      .addCase(createReviewThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
   },
 });
 
