@@ -58,10 +58,7 @@ const strLimit = (str, limit) => {
         <div className="border-t border-gray-200 flex flex-col">
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
                 <div className="col-span-1 md:col-span-8 ... sm:pb-0 md:pb-20">
-                    {orderData.length > 0 && (
                         <ContentLessson orderData={orderData[0]} type={lessonId} classId={id} testNo={no} test={test} tests={tests}/>   
-                    )
-                    }
                 </div>
                 <div className="cols-span-1 flex flex-col block md:hidden my-8">
                     <div className={`left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
