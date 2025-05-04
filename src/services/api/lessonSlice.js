@@ -19,6 +19,8 @@ export const fetchLessonById = createAsyncThunk(
     try {
       const res = await getDataById(id, 'lessons');
       const lesson = parseFirestoreFields(res.fields)
+      console.log(lesson);
+      
       let beforeLesson = null;
       let afterLesson = null;
       const lessons = await retrieveData('lessons', lesson.class_id,"class_id");
@@ -45,25 +47,71 @@ export const fetchLessonById = createAsyncThunk(
   }
 );
 
+export const fetchOrderLessonById = createAsyncThunk(
+  'orderLesson/getById',
+  async (id, thunkAPI) => {
+    try {
+      const res = await getDataById(id, 'order_lessons');
+      const lesson = parseFirestoreFields(res.fields)
+      let beforeLesson = null;
+      let afterLesson = null;
+      
+      // if (lesson.type === "video") {
+        const lessons = await retrieveData('lessons', lesson.class_id,"class_id");
+        lessons.forEach((item) => {
+          if (lesson.ordering > 0) {
+            if (Number(item.ordering) === (lesson.ordering - 1)) {
+              beforeLesson = item 
+            }
+          }
+          if (lesson.ordering < (lessons.length-1)) {
+            if (Number(item.ordering) === (Number(lesson.ordering) + 1)) {
+              afterLesson = item 
+            }
+          }
+        }) 
+      // }
+      return {
+        lesson : lesson,
+        beforeLesson: beforeLesson,
+        afterLesson: afterLesson
+      }
+    } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 export const fetchExamByNo = createAsyncThunk(
   'test/getByNo',
-  async ({orderId,type,no}, thunkAPI) => {
+  async (no, thunkAPI) => {
     try {
-      const where = [
-        {field: "order_id", operator: "==", value: orderId},
-        {field: "type", operator: "==", value: type},
-        {field: "no", operator: "==", value: no}
-      ]
-      const test = await retrieveDataMultipleCondition('order_lessons', where);
-      const whereTests = [
-        {field: "order_id", operator: "==", value: orderId},
-        {field: "type", operator: "==", value: type},
-      ]
+      const test = await getDataById(no, 'order_lessons');
       
-      const tests = await retrieveDataMultipleCondition('order_lessons', whereTests);
-      return {
-        test : test[0],
-        tests: tests,
+      if(test){
+        const testData = parseFirestoreFields(test.fields)
+        
+        let whereTests = [];
+        if (testData.type === "pre-test") {
+          whereTests = [
+            {field: "order_id", operator: "==", value: testData.order_id},
+            {field: "type", operator: "==", value: testData.type},
+          ]
+        }
+        if (testData.type === "quiz") {
+          whereTests = [
+            {field: "order_id", operator: "==", value: testData.order_id},
+            {field: "type", operator: "==", value: testData.type},
+            {field: "group_name", operator: "==", value: testData.group_name},
+          ]
+        }
+        
+        const tests = await retrieveDataMultipleCondition('order_lessons', whereTests);
+
+        return {
+          test : testData,
+          tests: tests,
+        }
       }
     } catch (error) {
     return thunkAPI.rejectWithValue(error.message);
@@ -85,24 +133,40 @@ export const updateAnswerThunk = createAsyncThunk(
 
 export const submitTestThunk = createAsyncThunk(
   'test/submit',
-  async ({orderId,type}, thunkAPI) => {
+  async (orderLessonId, thunkAPI) => {
     try {
-      const whereTests = [
-        {field: "order_id", operator: "==", value: orderId},
-        {field: "type", operator: "==", value: type},
-      ]
-      const tests = await retrieveDataMultipleCondition('order_lessons', whereTests);
-      let correct = 0;
-      for (let i = 0; i < tests.length; i++) {
-        if (tests[i].answer == tests.user_answer) {
-          correct++;
-        }
-        await update({submitted_at:new Date().toISOString()},'order_lessons',tests[i].id);
+      const orderLesson = await getDataById(orderLessonId,'order_lessons');
+      let whereTests = [];
+      if (orderLesson.type === "pre-test") {
+        whereTests = [
+          {field: "order_id", operator: "==", value: orderLesson.order_id},
+          {field: "type", operator: "==", value: orderLesson.type},
+        ]
       }
-      const score = (correct / tests.length) * 100
+      if (orderLesson.type === "quiz") {
+        whereTests = [
+          {field: "order_id", operator: "==", value: orderLesson.order_id},
+          {field: "type", operator: "==", value: orderLesson.type},
+          {field: "group_name", operator: "==", value: orderLesson.group_name},
+        ]
+      }
       
-      const res = await update({pretest_score:score},'orders',orderId);
-      return res;
+      const tests = await retrieveDataMultipleCondition('order_lessons', whereTests);
+      if (tests.length > 0) {
+        let correct = 0;
+        for (let i = 0; i < tests.length; i++) {
+          if (tests[i].answer == tests[i].user_answer) {
+            correct++;
+          }
+          await update({submitted_at:new Date().toISOString()},'order_lessons',tests[i].id);
+        }
+        const score = (correct / tests.length) * 100
+        
+        if (orderLesson.type === "pre-test") {
+          await update({pretest_score:score},'orders',orderLesson.order_id); 
+        }
+        return true; 
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -135,6 +199,19 @@ const lessonSlice = createSlice({
         state.afterLesson = action.payload.afterLesson;
       })
       .addCase(fetchLessonById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchOrderLessonById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchOrderLessonById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedLesson = action.payload.lesson;
+        state.beforeLesson = action.payload.beforeLesson;
+        state.afterLesson = action.payload.afterLesson;
+      })
+      .addCase(fetchOrderLessonById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

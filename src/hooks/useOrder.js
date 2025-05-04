@@ -1,11 +1,11 @@
 // hooks/useUser.js
 import { useDispatch, useSelector } from 'react-redux';
-import { createOrderThunk, createReviewThunk, getOrderById, getOrders, updateOrderThunk } from '../services/api/orderSlice';
+import { createOrderThunk, createReviewThunk, fetchTestResult, getOrderById, getOrders, updateOrderThunk } from '../services/api/orderSlice';
 import { useEffect } from 'react';
 
-const useOrder = (id=null,order_id=null, columnName=null, user_id = null) => {
+const useOrder = (id=null,order_id=null, columnName=null, user_id = null, testId = null) => {
   const dispatch = useDispatch();
-  const { orderData, currentOrder, loading, error, status, orderLessons } = useSelector(state => state.order);
+  const { orderData, currentOrder, loading, error, status, orderLessons, resultData } = useSelector(state => state.order);
 
   const createOrder = (userData) => {
     dispatch(createOrderThunk(userData));
@@ -20,6 +20,11 @@ const useOrder = (id=null,order_id=null, columnName=null, user_id = null) => {
   };
 
     useEffect(() => {
+      if (testId) {
+        console.log(testId);
+        
+        dispatch(fetchTestResult(testId));
+      }
       if (order_id || user_id) {
         dispatch(getOrders({order_id,columnName, user_id})); 
       }
@@ -28,7 +33,7 @@ const useOrder = (id=null,order_id=null, columnName=null, user_id = null) => {
       }
     }, [dispatch,order_id]);
 
-  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status, orderLessons, createReview };
+  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status, orderLessons, createReview, resultData };
 };
 
 export default useOrder;

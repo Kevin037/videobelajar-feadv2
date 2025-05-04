@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchExamByNo, fetchLessonById, submitTestThunk, updateAnswerThunk } from '../services/api/lessonSlice';
+import { fetchExamByNo, fetchLessonById, fetchOrderLessonById, submitTestThunk, updateAnswerThunk } from '../services/api/lessonSlice';
 
 const useLesson = (id=null, orderId = null, type = null, no = null) => {
   const dispatch = useDispatch();
@@ -12,16 +12,16 @@ const useLesson = (id=null, orderId = null, type = null, no = null) => {
     dispatch(updateAnswerThunk({id,AnswerData}));
   };
 
-  const submitTest = (orderId,type) => {
-    dispatch(submitTestThunk({orderId,type}));
+  const submitTest = (orderLessonId) => {
+    dispatch(submitTestThunk(orderLessonId));
   };
 
   useEffect(() => {
-    if (orderId || type || no) {
-      dispatch(fetchExamByNo({orderId,type,no}));
+    if (no) {
+      dispatch(fetchExamByNo(no));
     }
     if (id) {
-      dispatch(fetchLessonById(id)); 
+      dispatch(fetchOrderLessonById(id)); 
     }
   }, [dispatch,id,orderId,type,no]);
 

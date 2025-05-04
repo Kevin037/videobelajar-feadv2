@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { deleteDataById, getDataById, parseFirestoreFields, retrieveData, store, update } from "../db";
+import { deleteDataById, getDataById, parseFirestoreFields, retrieveData, retrieveDataMultipleCondition, store, update } from "../db";
 
 const initialState = {
   orderData: [],
@@ -7,7 +7,8 @@ const initialState = {
   currentOrder: null,
   loading: false,
   error: null,
-  status: null
+  status: null,
+  resultData: null
 };
 
 export const createOrderThunk = createAsyncThunk(
@@ -76,11 +77,21 @@ export const getOrders = createAsyncThunk(
   async ({order_id,columnName,user_id}, thunkAPI) => {
     try {
       const data = await retrieveData('orders', order_id, columnName,user_id);
+      let pretestId = null;
+      let quizes = [];
       if (data[0]?.order_id) {
         let orderLessons = [];
         if (order_id != null && columnName != null) {
           const lessons = await retrieveData('order_lessons', data[0].order_id, "order_id");
           lessons.sort((a, b) => a.ordering - b.ordering);
+          lessons.forEach((lesson) => {
+            if (lesson.type === "pre-test" && lesson.no === '1') {
+              pretestId = lesson.id
+            }
+            if (lesson.type === "quiz" && lesson.no === '1') {
+              quizes.push(lesson.id)
+            }
+          })
           const groupedLessons = lessons.reduce((acc, lesson) => {
             if (lesson.type === "video") {
               const groupName = lesson.group_name || "Ungrouped";
@@ -93,13 +104,25 @@ export const getOrders = createAsyncThunk(
             }
             return acc;
           }, {});
-    
-          // Convert grouped object to array
-          orderLessons = Object.entries(groupedLessons).map(([groupName, lessons]) => ({
-            title: groupName,
-            lessons: lessons,
-          }));
+
+          let i = 0;
+          orderLessons = Object.entries(groupedLessons).map(([groupName, lessons]) => {
+            const extraItem = {
+              id:quizes[i],
+              lesson_id: quizes[i],
+              name: groupName,
+              type: 'quiz',
+              group_name: groupName,
+            }
+            i++;
+
+            return {
+              title: groupName,
+              lessons: [...lessons,extraItem],
+            }
+          });
         }
+        data[0].pretestId = pretestId
         return {
           orderData: data,
           orderLessons: orderLessons
@@ -119,6 +142,55 @@ export const getOrderById = createAsyncThunk(
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchTestResult = createAsyncThunk(
+  'test/result',
+  async (testId, thunkAPI) => {
+    try {
+      const test = await getDataById(testId, 'order_lessons');
+      
+      if(test){
+        const testData = parseFirestoreFields(test.fields)
+        
+        let whereTests = [];
+        if (testData.type === "pre-test") {
+          whereTests = [
+            {field: "order_id", operator: "==", value: testData.order_id},
+            {field: "type", operator: "==", value: testData.type},
+          ]
+        }
+        if (testData.type === "quiz") {
+          whereTests = [
+            {field: "order_id", operator: "==", value: testData.order_id},
+            {field: "type", operator: "==", value: testData.type},
+            {field: "group_name", operator: "==", value: testData.group_name},
+          ]
+        }
+        
+        const tests = await retrieveDataMultipleCondition('order_lessons', whereTests);
+        let correct = 0;
+        for (let i = 0; i < tests.length; i++) {
+          if (tests[i].answer == tests.user_answer) {
+            correct++;
+          }
+        }
+        const score = (correct / tests.length) * 100
+        
+        return {
+          resultData : {
+            total_questions : tests.length,
+            correct_answers : correct,
+            score : score,
+            wrong_answers : tests.length - correct,
+            submittedAt: test.submitted_at
+          }
+        }
+      }
+    } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
@@ -197,6 +269,17 @@ const orderSlice = createSlice({
       .addCase(createReviewThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
+      })
+      .addCase(fetchTestResult.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchTestResult.fulfilled, (state, action) => {
+        state.loading = false;
+        state.resultData = action.payload.resultData;
+      })
+      .addCase(fetchTestResult.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
   },
 });

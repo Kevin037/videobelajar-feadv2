@@ -6,16 +6,20 @@ import { ucfirst } from "../../data";
 import TestResult from "./ResultTestSegment";
 
 export const ContentLessson = (props) => {
-    const {orderData,type,classId,testNo,test,tests} = props
+    const {orderData,type,classId,testNo,test,tests,rules,resultData} = props
     return (
         <>
         {testNo != null ? (
             testNo === "result" ? (
-                <TestResult orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} />
+                <TestResult orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} resultData={resultData} />
+            ) : (rules === "rules" || rules === "result") ? (rules === "rules") ? (
+                <TestLesson orderData={orderData} type={type} classId={classId} testNo={testNo} />
+            ) : (
+                <TestResult orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} resultData={resultData} />
             ) : (
                 <QuestionLesson orderData={orderData} type={type} classId={classId} testNo={testNo} test={test} tests={tests} />
             )
-        ) : ['pre-test','quiz'].includes(type) ? (
+        ) : ['pre-test'].includes(type) ? (
                     <TestLesson orderData={orderData} type={type} classId={classId} />
                 ) : (
             <VideoLessson orderData={orderData} />
@@ -51,7 +55,7 @@ export const VideoLessson = (props) => {
 }
 
 export const TestLesson = (props) => {
-    const {orderData,type,classId} = props
+    const {orderData,type,classId,testNo} = props
     return (
         <>
             <img src="/assets/rules.svg" alt="" />
@@ -60,7 +64,7 @@ export const TestLesson = (props) => {
                 <p className="my-2">Kerjakan {type} dengan sebaik mungkin untuk mengukur pemahaman awalmu terkait materi yang akan kamu pelajari</p>
                 <p className="my-2">Syarat Nilai Kelulusan: - <br />Durasi Ujian: 5 Menit</p>
                 <p className="my-2">Jangan khawatir, total skor tidak akan memengaruhi kelulusan dan penilaian akhirmu dalam rangkaian kelas ini</p>
-            <ButtonPrimaryMD url={`/class/${classId}/pre-test/1`} varian="mt-4">Mulai {ucfirst(type)}</ButtonPrimaryMD>
+            <ButtonPrimaryMD url={`/class/${classId}/pre-test/${testNo}`} varian="mt-4">Mulai {ucfirst(type)}</ButtonPrimaryMD>
             </div>
         </>
     )

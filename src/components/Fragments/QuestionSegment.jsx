@@ -27,7 +27,7 @@ const QuestionLesson = (props) => {
     const SendAnswer = (e,key) => {
         setSelectedOption(key)
         e.preventDefault();
-        updateAnswer(test.id,{user_answer:key});
+        updateAnswer(testNo,{user_answer:key});
     };
 
     const SubmitTest = (e) => {
@@ -37,12 +37,12 @@ const QuestionLesson = (props) => {
             return false;
         }
         if (confirm("Apakah kamu yakin ingin menyelesaikan tes ini?")) {
-            submitTest(orderData?.id,type);
+            submitTest(testNo);
         }
     };
     useEffect(() => {
         if (submitStatus) {
-            window.location.href = `/class/${orderData?.id}/pre-test/result`
+            // window.location.href = `/class/${orderData?.id}/pre-test/${testNo}/result`
         }
     }, [submitStatus]);
     return (
@@ -52,9 +52,9 @@ const QuestionLesson = (props) => {
                     <div className="grid grid-cols-10 ...">
                         {tests && tests.map((pretest) => (
                         <div className="col-span-2 ... p-2">
-                            <a href={`/class/${classId}/${type}/${pretest.no}`} 
+                            <a href={`/class/${classId}/${type}/${pretest.id}`} 
                             className={`border-1 p-2 w-8 h-8 flex items-center justify-center border-gray-300 border-radius
-                            ${pretest.user_answer != "" ? "bg-green-50 text-green-900 font-bold" : ""} ${pretest.no == testNo ? "bg-green-200 text-green-800" : ""}`}>{pretest.no}</a>
+                            ${pretest.user_answer != "" ? "bg-green-50 text-green-900 font-bold" : ""} ${pretest.id == testNo ? "bg-green-200 text-green-800" : ""}`}>{pretest.no}</a>
                         </div>
                         ))}
                     </div>
@@ -84,29 +84,31 @@ const QuestionLesson = (props) => {
                             </label>
                         ))}
                     </div>
-                    <div className="grid grid-cols-2 gap-2 mt-8">
-                        <div className="col-span-1">
-                            {testNo > 1 && (
-                            <ButtonSecondary varian="w-full flex justify-center gap-2" url={`/class/${classId}/${type}/${parseInt(test?.no)-1}`}>                        
-                                <ArrowLeft/>
-                                <span className="text-sm font-medium">Sebelumnya</span>
-                            </ButtonSecondary>   
-                            )}
+                    {tests.length > 0 && (
+                        <div className="grid grid-cols-2 gap-2 mt-8">
+                            <div className="col-span-1">
+                                {test?.no > 1 && (
+                                <ButtonSecondary varian="w-full flex justify-center gap-2" url={`/class/${classId}/${type}/${tests[parseInt(parseInt(test.no)-2)].id}`}>                        
+                                    <ArrowLeft/>
+                                    <span className="text-sm font-medium">Sebelumnya</span>
+                                </ButtonSecondary>   
+                                )}
+                            </div>
+                            <div className="col-span-1">
+                                {test?.no < tests.length ? (
+                                <ButtonPrimary varian=" flex justify-center gap-2" url={`/class/${classId}/${type}/${tests[parseInt(parseInt(test.no))].id}`}>
+                                    <span className="text-sm font-medium">Selanjutnya</span>
+                                    <ArrowRight />
+                                </ButtonPrimary>
+                                ) : (
+                                <ButtonPrimary varian=" flex justify-center gap-2" onClick={(e) => SubmitTest(e)}>
+                                    <span className="text-sm font-medium">Submit</span>
+                                    <Check />
+                                </ButtonPrimary>
+                                )}
+                            </div>
                         </div>
-                        <div className="col-span-1">
-                            {testNo < tests.length ? (
-                            <ButtonPrimary varian=" flex justify-center gap-2" url={`/class/${classId}/${type}/${parseInt(test?.no)+1}`}>
-                                <span className="text-sm font-medium">Selanjutnya</span>
-                                <ArrowRight />
-                            </ButtonPrimary>
-                            ) : (
-                            <ButtonPrimary varian=" flex justify-center gap-2" onClick={(e) => SubmitTest(e)}>
-                                <span className="text-sm font-medium">Submit</span>
-                                <Check />
-                            </ButtonPrimary>
-                            )}
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </>
