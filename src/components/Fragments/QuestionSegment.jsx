@@ -31,7 +31,7 @@ const QuestionLesson = (props) => {
     };
 
     const SubmitTest = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         if (totalAnswer != answerOptions.length) {
             alert("Jawaban belum lengkap");
             return false;
@@ -42,13 +42,14 @@ const QuestionLesson = (props) => {
     };
     useEffect(() => {
         if (submitStatus) {
-            // window.location.href = `/class/${orderData?.id}/pre-test/${testNo}/result`
+            window.location.href = `/class/${orderData?.id}/pre-test/${testNo}/result`
         }
     }, [submitStatus]);
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
                 <div className="col-span-1 md:col-span-4 ... sm:pb-0 md:pb-20 border-r p-4">
+                <h1 className="font-bold mb-2">List Soal</h1>
                     <div className="grid grid-cols-10 ...">
                         {tests && tests.map((pretest) => (
                         <div className="col-span-2 ... p-2">
@@ -59,7 +60,7 @@ const QuestionLesson = (props) => {
                         ))}
                     </div>
                 </div>
-                <div className="col-span-1 md:col-span-8 ... sm:pb-0 md:pb-20 p-4">
+                <div className="col-span-1 md:col-span-8 ... sm:pb-0 md:pb-20 p-4 border-t-1 border-gray-300 md:border-t-0">
                     <H1>Pertanyaan {test?.no}</H1>
                     <p className="my-2">{test?.question}</p>
                     <div>

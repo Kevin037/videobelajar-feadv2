@@ -192,7 +192,7 @@ export const fetchTestResult = createAsyncThunk(
             correct_answers : correct,
             score : score,
             wrong_answers : tests.length - correct,
-            submittedAt: test.submitted_at
+            submitted_at: testData.submitted_at
           }
         }
       }

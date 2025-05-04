@@ -37,14 +37,12 @@ export const VideoLessson = (props) => {
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
                 <H1>Download Rangkuman Modul</H1>
                 <p className="text-gray-500">Silakan download rangkuman modul dari materi yang telah kamu pelajari</p>
-                {/* <div className="col-span-3"> */}
-                    <ButtonWhiteMD varian="mt-4">
-                    <div className="flex gap-2 justify-center">
-                        <img src="/assets/download.svg" alt="" />
-                        <span>Download Rangkuman</span>
-                    </div>
-                    </ButtonWhiteMD>
-                {/* </div> */}
+                <ButtonWhiteMD varian="mt-4">
+                <div className="flex gap-2 justify-center">
+                    <img src="/assets/download.svg" alt="" />
+                    <span>Download Rangkuman</span>
+                </div>
+                </ButtonWhiteMD>
             </div>
             )}
             {selectedLesson?.type === "video" && (
@@ -80,7 +78,7 @@ export const TestLesson = (props) => {
                 <p className="my-2">Kerjakan {type} dengan sebaik mungkin untuk mengukur pemahaman awalmu terkait materi yang akan kamu pelajari</p>
                 <p className="my-2">Syarat Nilai Kelulusan: - <br />Durasi Ujian: 5 Menit</p>
                 <p className="my-2">Jangan khawatir, total skor tidak akan memengaruhi kelulusan dan penilaian akhirmu dalam rangkaian kelas ini</p>
-            <ButtonPrimaryMD url={`/class/${classId}/pre-test/${testNo}`} varian="mt-4">Mulai {ucfirst(type)}</ButtonPrimaryMD>
+            <ButtonPrimaryMD url={`/class/${classId}/pre-test/${testNo}`} varian="mt-4 text-center">Mulai {ucfirst(type)}</ButtonPrimaryMD>
             </div>
         </>
     )
