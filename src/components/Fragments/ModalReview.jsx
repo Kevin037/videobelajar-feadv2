@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useOrder from "../../hooks/useOrder";
 import { ButtonPrimary, ButtonWhite } from "../Elements/button";
+import Modal from "../Elements/Modal";
 
 export default function ModalReview({ isOpen, onClose, id, user_rating }) {
   if (!isOpen) return null;
@@ -25,16 +26,8 @@ export default function ModalReview({ isOpen, onClose, id, user_rating }) {
   }, [status]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* BACKDROP HITAM TRANSPARAN */}
-      <div
-        className="fixed inset-0 bg-opacity-50 transition-opacity"
-        onClick={onClose}
-      ></div>
-
-      {/* MODAL */}
-      <div className="relative bg-white rounded-lg shadow-lg w-full max-w-md p-6 shadow-lg z-50">
-        {!showForm ? (
+    <Modal isOpen={isOpen} onClose={onClose}>
+              {!showForm ? (
           <>
                             <h2 className="text-center text-lg font-bold mb-4">Review Sudah Terkirim</h2>
         <p className="text-center mb-4">
@@ -85,7 +78,6 @@ export default function ModalReview({ isOpen, onClose, id, user_rating }) {
         </div>
           </>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }

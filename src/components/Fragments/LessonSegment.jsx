@@ -78,7 +78,7 @@ export const TestLesson = (props) => {
                 <p className="my-2">Kerjakan {type} dengan sebaik mungkin untuk mengukur pemahaman awalmu terkait materi yang akan kamu pelajari</p>
                 <p className="my-2">Syarat Nilai Kelulusan: - <br />Durasi Ujian: 5 Menit</p>
                 <p className="my-2">Jangan khawatir, total skor tidak akan memengaruhi kelulusan dan penilaian akhirmu dalam rangkaian kelas ini</p>
-            <ButtonPrimaryMD url={`/class/${classId}/pre-test/${testNo}`} varian="mt-4 text-center">Mulai {ucfirst(type)}</ButtonPrimaryMD>
+            <ButtonPrimaryMD url={`/class/${classId}/${type}/${testNo}`} varian="mt-4 text-center">Mulai {ucfirst(type)}</ButtonPrimaryMD>
             </div>
         </>
     )

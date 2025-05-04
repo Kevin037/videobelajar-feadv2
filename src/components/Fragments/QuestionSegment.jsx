@@ -4,13 +4,15 @@ import { json_to_array } from "../../data";
 import { ArrowLeft, ArrowRight, Check} from "lucide-react";
 import { H1 } from "../Elements/heading";
 import { ButtonPrimary, ButtonSecondary } from "../Elements/button";
+import ModalSubmitTest from "./ModalSubmitTest";
 
 const QuestionLesson = (props) => {
     const {orderData,type,classId,testNo,test,tests} = props
     const [answerOptions, setAnswerOptions] = useState([]);
-    const {updateAnswer,submitTest,submitStatus} = useLesson();
+    const {updateAnswer,submitStatus} = useLesson();
     const [selectedOption, setSelectedOption] = useState(test?.user_answer);
     const [totalAnswer, setTotalAnswer] = useState(0);
+    const [isModalOpen, setModalOpen] = useState(false);
     useEffect(() => {
         if (test?.options) {
             setAnswerOptions(json_to_array(JSON.parse(test?.options)));
@@ -29,22 +31,6 @@ const QuestionLesson = (props) => {
         e.preventDefault();
         updateAnswer(testNo,{user_answer:key});
     };
-
-    const SubmitTest = (e) => {
-        e.preventDefault()
-        if (totalAnswer != answerOptions.length) {
-            alert("Jawaban belum lengkap");
-            return false;
-        }
-        if (confirm("Apakah kamu yakin ingin menyelesaikan tes ini?")) {
-            submitTest(testNo);
-        }
-    };
-    useEffect(() => {
-        if (submitStatus) {
-            window.location.href = `/class/${orderData?.id}/pre-test/${testNo}/result`
-        }
-    }, [submitStatus]);
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
@@ -102,10 +88,20 @@ const QuestionLesson = (props) => {
                                     <ArrowRight />
                                 </ButtonPrimary>
                                 ) : (
-                                <ButtonPrimary varian=" flex justify-center gap-2" onClick={(e) => SubmitTest(e)}>
-                                    <span className="text-sm font-medium">Submit</span>
-                                    <Check />
-                                </ButtonPrimary>
+                                    <>
+                                        <ButtonPrimary varian=" flex justify-center gap-2" onClick={() => setModalOpen(true)}>
+                                            <span className="text-sm font-medium">Submit</span>
+                                            <Check />
+                                        </ButtonPrimary>
+                                        <ModalSubmitTest 
+                                            isOpen={isModalOpen} 
+                                            onClose={() => setModalOpen(false)} 
+                                            testNo={testNo} 
+                                            totalQuestions={answerOptions.length} 
+                                            totalAnswer={totalAnswer}
+                                            orderId={orderData?.id}
+                                            type={type} />
+                                    </>
                                 )}
                             </div>
                         </div>
