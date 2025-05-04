@@ -1,12 +1,12 @@
 import VideoPlayer from "../Fragments/Video";
 import { H1 } from "../Elements/heading";
-import { ButtonPrimaryMD } from "../Elements/button";
+import { ButtonPrimaryMD, ButtonWhiteMD } from "../Elements/button";
 import QuestionLesson from "./QuestionSegment";
 import { ucfirst } from "../../data";
 import TestResult from "./ResultTestSegment";
 
 export const ContentLessson = (props) => {
-    const {orderData,type,classId,testNo,test,tests,rules,resultData} = props
+    const {orderData,type,classId,testNo,test,tests,rules,resultData,selectedLesson} = props
     return (
         <>
         {testNo != null ? (
@@ -22,17 +22,32 @@ export const ContentLessson = (props) => {
         ) : ['pre-test'].includes(type) ? (
                     <TestLesson orderData={orderData} type={type} classId={classId} />
                 ) : (
-            <VideoLessson orderData={orderData} />
+            <VideoLessson orderData={orderData} selectedLesson={selectedLesson} />
         )}
         </>
     )
 }
 
 export const VideoLessson = (props) => {
-    const {orderData} = props
+    const {orderData,selectedLesson} = props
     return (
         <>
             <VideoPlayer />
+            {selectedLesson?.type === "rangkuman" && (
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
+                <H1>Download Rangkuman Modul</H1>
+                <p className="text-gray-500">Silakan download rangkuman modul dari materi yang telah kamu pelajari</p>
+                {/* <div className="col-span-3"> */}
+                    <ButtonWhiteMD varian="mt-4">
+                    <div className="flex gap-2 justify-center">
+                        <img src="/assets/download.svg" alt="" />
+                        <span>Download Rangkuman</span>
+                    </div>
+                    </ButtonWhiteMD>
+                {/* </div> */}
+            </div>
+            )}
+            {selectedLesson?.type === "video" && (
             <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-4">
                 <H1>Praktikkan Skill dengan Technical Book</H1>
                 <p>Pelajari dan praktikkan skill teknis dalam berbagai industri dengan Technical Book Riselearn</p>
@@ -50,6 +65,7 @@ export const VideoLessson = (props) => {
                     <p>{orderData?.rating} ({orderData?.total_selling})</p>
                 </div>
             </div>
+            )}
         </>
     )
 }

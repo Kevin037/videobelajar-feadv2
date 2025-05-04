@@ -107,6 +107,13 @@ export const getOrders = createAsyncThunk(
 
           let i = 0;
           orderLessons = Object.entries(groupedLessons).map(([groupName, lessons]) => {
+            const resume = {
+              id:order_id.slice(0, 4)+i,
+              lesson_id: 'rsm'+i,
+              name: groupName,
+              type: 'rangkuman',
+              group_name: groupName,
+            }
             const extraItem = {
               id:quizes[i],
               lesson_id: quizes[i],
@@ -118,7 +125,7 @@ export const getOrders = createAsyncThunk(
 
             return {
               title: groupName,
-              lessons: [...lessons,extraItem],
+              lessons: [...lessons,resume,extraItem],
             }
           });
         }

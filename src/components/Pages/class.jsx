@@ -15,7 +15,7 @@ const MyClassPage = () => {
     const { orderData, orderLessons } = useOrder(null,id,"order_id");
     const quizId = (rules === "result") ? no : null;
     const { resultData } = useOrder(null,null,null,null,quizId);
-    const lesson_id = (lessonId  == "pre-test" || lessonId  == "quiz") ?  (lessonId  == "pre-test") ? orderLessons[0]?.lessons[0]?.id : no : lessonId;
+    const lesson_id = (lessonId) ? (lessonId  == "pre-test" || lessonId  == "quiz") ?  (lessonId  == "pre-test") ? orderLessons[0]?.lessons[0]?.id : no : lessonId : orderLessons[0]?.lessons[0]?.id;
     const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
     const { test, tests } = useLesson(null, null, null, no);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -64,7 +64,7 @@ const strLimit = (str, limit) => {
         <div className="border-t border-gray-200 flex flex-col">
             <div className="grid grid-cols-1 md:grid-cols-12 ...">
                 <div className="col-span-1 md:col-span-8 ... sm:pb-0 md:pb-20">
-                    <ContentLessson orderData={orderData[0]} type={lessonId} classId={id} testNo={no} test={test} tests={tests} rules={rules} resultData={resultData}/>   
+                    <ContentLessson orderData={orderData[0]} type={lessonId} classId={id} testNo={no} test={test} tests={tests} rules={rules} resultData={resultData} selectedLesson={selectedLesson}/>   
                 </div>
                 <div className="cols-span-1 flex flex-col block md:hidden my-8">
                     <div className={`left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
@@ -114,7 +114,7 @@ const strLimit = (str, limit) => {
                         {openIndex === section.title && section.lessons.length > 0 && (
                             <div className="mt-3 space-y-2">
                             {section.lessons.map((lesson, i) => (
-                                <a key={i} href={(lesson.type === "video") ? `/class/${id}/${lesson.id}` : `/class/${id}/quiz/${lesson.lesson_id}/rules`} 
+                                <a key={i} href={(lesson.type === "quiz") ? `/class/${id}/quiz/${lesson.lesson_id}/rules` : `/class/${id}/${lesson.id}`} 
                                 className="flex items-center">
                                 <div
                                 key={i}
@@ -124,6 +124,7 @@ const strLimit = (str, limit) => {
                                         <div className="flex items-center gap-1">
                                             {lesson.type === "quiz" && <img src="/assets/test.svg" alt="" />}
                                             {lesson.type === "video" && <img src="/assets/play.svg" alt="" />}
+                                            {lesson.type === "rangkuman" && <img src="/assets/rangkuman.svg" alt="" />}
                                             <span className="text-sm text-gray-800">{ucfirst(lesson.type)}: </span>
                                             {lesson.name}
                                         </div>

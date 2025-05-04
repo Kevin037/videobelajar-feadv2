@@ -214,8 +214,8 @@ function buildFirestoreFields(data) {
     return fields;
   }
   
-  export async function store(data,collectionName) {
-    const endpoint = `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}`;
+  export async function store(data,collectionName,customId = null) {
+    const endpoint = (customId) ? `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}/${customId}` : `/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}`;
     
     const body = {
       fields: buildFirestoreFields(data),
