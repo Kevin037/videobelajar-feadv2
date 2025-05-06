@@ -158,6 +158,7 @@ const strLimit = (str, limit) => {
                             {strLimit(afterLesson?.name, 60)} <span className="text-xl">→</span>
                         </button>
                     )}
+                    {!beforeLesson && !afterLesson && (<div className="flex items-center gap-2 text-xl text-green-600">..</div>)}
                 </div>
             </div>
         </div>

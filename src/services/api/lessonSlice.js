@@ -57,19 +57,25 @@ export const fetchOrderLessonById = createAsyncThunk(
       let afterLesson = null;
       
       // if (lesson.type === "video") {
-        const lessons = await retrieveData('lessons', lesson.class_id,"class_id");
-        lessons.forEach((item) => {
-          if (lesson.ordering > 0) {
-            if (Number(item.ordering) === (lesson.ordering - 1)) {
-              beforeLesson = item 
+        let whereTests = [
+          {field: "order_id", operator: "==", value: lesson.order_id},
+          {field: "type", operator: "==", value: "video"},
+        ]
+        const lessons = await retrieveDataMultipleCondition('order_lessons', whereTests);
+        lessons.sort((a, b) => a.ordering - b.ordering);
+        lessons.forEach((item,key) => {          
+          if (key > 0) {
+            if (Number(item.ordering) < lesson.ordering) {
+              beforeLesson = item
             }
           }
-          if (lesson.ordering < (lessons.length-1)) {
-            if (Number(item.ordering) === (Number(lesson.ordering) + 1)) {
-              afterLesson = item 
+          if (key < lessons.length) {
+            if (Number(item.ordering) > Number(lesson.ordering)) {
+              
+              if (afterLesson == null) afterLesson = item
             }
           }
-        }) 
+        })
       // }
       return {
         lesson : lesson,

@@ -99,7 +99,7 @@ const QuestionLesson = (props) => {
                                             testNo={testNo} 
                                             totalQuestions={answerOptions.length} 
                                             totalAnswer={totalAnswer}
-                                            orderId={orderData?.id}
+                                            orderId={orderData?.order_id}
                                             type={type} />
                                     </>
                                 )}
