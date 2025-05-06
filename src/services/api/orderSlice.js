@@ -79,6 +79,8 @@ export const getOrders = createAsyncThunk(
       const data = await retrieveData('orders', order_id, columnName,user_id);
       let pretestId = null;
       let quizes = [];
+      let totalModule = 0;
+      let totalCompletedModule = 0;
       if (data[0]?.order_id) {
         let orderLessons = [];
         if (order_id != null && columnName != null) {
@@ -90,6 +92,10 @@ export const getOrders = createAsyncThunk(
             }
             if (lesson.type === "quiz" && lesson.no === '1') {
               quizes.push(lesson.id)
+            }
+            if (lesson.type === "video") {
+              totalModule++;
+              if (lesson.complete) totalCompletedModule++;
             }
           })
           const groupedLessons = lessons.reduce((acc, lesson) => {
@@ -135,6 +141,9 @@ export const getOrders = createAsyncThunk(
           });
         }
         data[0].pretestId = pretestId
+        data[0].totalModule = totalModule
+        data[0].totalCompletedModule = totalCompletedModule
+        data[0].progress = (totalCompletedModule / totalModule) * 100  
         return {
           orderData: data,
           orderLessons: orderLessons

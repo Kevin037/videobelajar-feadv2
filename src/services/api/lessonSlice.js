@@ -19,8 +19,6 @@ export const fetchLessonById = createAsyncThunk(
     try {
       const res = await getDataById(id, 'lessons');
       const lesson = parseFirestoreFields(res.fields)
-      console.log(lesson);
-      
       let beforeLesson = null;
       let afterLesson = null;
       const lessons = await retrieveData('lessons', lesson.class_id,"class_id");
@@ -64,8 +62,8 @@ export const fetchOrderLessonById = createAsyncThunk(
         const lessons = await retrieveDataMultipleCondition('order_lessons', whereTests);
         lessons.sort((a, b) => a.ordering - b.ordering);
         lessons.forEach((item,key) => {          
-          if (key > 0) {
-            if (Number(item.ordering) < lesson.ordering) {
+          if (lesson.ordering > 0) {
+            if (Number(item.ordering) < Number(lesson.ordering)) {
               beforeLesson = item
             }
           }
@@ -130,6 +128,18 @@ export const updateAnswerThunk = createAsyncThunk(
   async ({id,AnswerData}, thunkAPI) => {
     try {
       const res = await update(AnswerData,'order_lessons',id);
+      return res;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const CompleteModuleThunk = createAsyncThunk(
+  'order_lesson/complete',
+  async (id, thunkAPI) => {
+    try {
+      const res = await update({complete:true},'order_lessons',id);
       return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -254,6 +264,18 @@ const lessonSlice = createSlice({
         state.submitStatus = true;
       })
       .addCase(submitTestThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      })
+      .addCase(CompleteModuleThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(CompleteModuleThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.status = true; // data user baru dari Firestore
+      })
+      .addCase(CompleteModuleThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       })

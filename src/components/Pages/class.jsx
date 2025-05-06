@@ -19,6 +19,7 @@ const MyClassPage = () => {
     const { selectedLesson,beforeLesson,afterLesson } = useLesson(lesson_id);
     const { test, tests } = useLesson(null, null, null, no);
     const [isModalOpen, setModalOpen] = useState(false);
+    const {completeModule,status} = useLesson()
 
 useEffect(() => {
     if(token === null) {
@@ -28,6 +29,7 @@ useEffect(() => {
 
 const [openIndex, setOpenIndex] = useState("");
 const [activeLesson, setActiveLesson] = useState("");
+const [nextPage, setNextPage] = useState(null);
 
 useEffect(() => {
     if (selectedLesson) {
@@ -49,6 +51,24 @@ const strLimit = (str, limit) => {
     return str.length > limit ? str.substring(0, limit) + "..." : str;
   };
 
+const CompleteModule = (e,key) => {
+    if (selectedLesson?.complete) {
+        window.location.href = `/class/${id}/${key}`
+        return false;
+    }
+    setNextPage(key);
+    e.preventDefault();
+    if (confirm("Apakah anda yakin ingin menyelesaikan modul ini?")) {
+        completeModule(lessonId);   
+    }
+};
+
+useEffect(() => {
+    if (status) {
+        window.location.href = `/class/${id}/${nextPage}`
+    }
+  }, [status]);
+
  return (
     <Authlayout 
         title="Home" 
@@ -58,7 +78,7 @@ const strLimit = (str, limit) => {
         customLogo={beforeLesson && (
             <a href={`/class/${id}/${beforeLesson?.id}`}><span className="text-xl">←</span> {strLimit(beforeLesson?.name, 60)}</a>
         )}
-        customHead={<ProgressPopover id={orderData[0]?.id} progress={100} />}
+        customHead={<ProgressPopover id={orderData[0]?.id} progress={orderData[0]?.progress} completeModule={orderData[0]?.totalCompletedModule} totalModule={orderData[0]?.totalModule} />}
         userPhoto={true}
     >
         <div className="border-t border-gray-200 flex flex-col">
@@ -123,7 +143,7 @@ const strLimit = (str, limit) => {
                                     <div>
                                         <div className="flex items-center gap-1">
                                             {lesson.type === "quiz" && <img src="/assets/test.svg" alt="" />}
-                                            {lesson.type === "video" && <img src="/assets/play.svg" alt="" />}
+                                            {lesson.type === "video" ? (lesson.complete) ? (<img src="/assets/completeModule.svg" alt="" />) : (<img src="/assets/play.svg" alt="" />) : ""}
                                             {lesson.type === "rangkuman" && <img src="/assets/rangkuman.svg" alt="" />}
                                             <span className="text-sm text-gray-800">{ucfirst(lesson.type)}: </span>
                                             {lesson.name}
@@ -149,12 +169,12 @@ const strLimit = (str, limit) => {
             <div className="flex flex-col hidden md:block">
                 <div className={`fixed bottom-0 left-0 w-full bg-green-600 text-white flex ${afterLesson && !beforeLesson ? "justify-end" : "justify-between"} items-center px-4 py-3 z-50`}>
                     {beforeLesson && (
-                        <button className="flex items-center gap-2 hover:opacity-70 cursor-pointer" onClick={() => {window.location.href = `/class/${id}/${beforeLesson?.id}`}}>
+                        <button className="flex items-center gap-2 hover:opacity-70 cursor-pointer" onClick={(e) => CompleteModule(e,beforeLesson?.id)}>
                             <span className="text-xl">←</span> {strLimit(beforeLesson?.name, 60)}
                         </button>
                     )}
                     {afterLesson && (
-                        <button className="flex items-right gap-2 hover:opacity-70 cursor-pointer" onClick={() => {window.location.href = `/class/${id}/${afterLesson?.id}`}}>
+                        <button className="flex items-right gap-2 hover:opacity-70 cursor-pointer" onClick={(e) => {CompleteModule(e,afterLesson?.id)}}>
                             {strLimit(afterLesson?.name, 60)} <span className="text-xl">→</span>
                         </button>
                     )}

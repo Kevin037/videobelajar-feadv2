@@ -64,7 +64,7 @@ const QuestionLesson = (props) => {
                                 name="custom-radio"
                                 value={option.value}
                                 checked={selectedOption === option.key}
-                                onChange={(e) => SendAnswer(e,option.key)}
+                                onChange={(e) =>  (e,option.key)}
                                 className="accent-green-500 mr-3"
                             />
                             <span className="text-sm">{option.value}</span>
