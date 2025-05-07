@@ -134,7 +134,7 @@ useEffect(() => {
                         {openIndex === section.title && section.lessons.length > 0 && (
                             <div className="mt-3 space-y-2">
                             {section.lessons.map((lesson, i) => (
-                                <a key={i} href={(lesson.type === "quiz") ? `/class/${id}/quiz/${lesson.lesson_id}/rules` : `/class/${id}/${lesson.id}`} 
+                                <a key={i} href={(lesson.type === "quiz") ? `/class/${id}/quiz/${lesson.id}/rules` : `/class/${id}/${lesson.id}`} 
                                 className="flex items-center">
                                 <div
                                 key={i}
@@ -146,7 +146,7 @@ useEffect(() => {
                                             {lesson.type === "video" ? (lesson.complete) ? (<img src="/assets/completeModule.svg" alt="" />) : (<img src="/assets/play.svg" alt="" />) : ""}
                                             {lesson.type === "rangkuman" && <img src="/assets/rangkuman.svg" alt="" />}
                                             <span className="text-sm text-gray-800">{ucfirst(lesson.type)}: </span>
-                                            {lesson.name}
+                                            {(lesson.type === "video") ?lesson.name : lesson.group_name}
                                         </div>
                                         {lesson.duration && (
                                             <span className="text-sm text-gray-500 ml-6">{lesson.duration} menit</span>

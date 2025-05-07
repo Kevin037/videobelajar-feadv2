@@ -67,7 +67,7 @@ export const paidOrderThunk = createAsyncThunk(
       const orderRaw = await getDataById(id,'orders');
       const order = parseFirestoreFields(orderRaw.fields);
       const pretestsRaw = await retrieveData('pretests');
-      const pretests = pretestsRaw.map(item => ({
+      const pretests = pretestsRaw.map(({ id, ...item }) => ({
         ...item,
         type: 'pre-test'
       }));
@@ -97,15 +97,15 @@ export const paidOrderThunk = createAsyncThunk(
       const groupedData = groupNames.map(group => {
         const lessonItems = lessons
           .filter(item => item.group_name === group)
-          .map(({ ordering, ...rest }) => rest); // remove ordering
+          .map(({ ordering, id, ...rest }) => rest); // remove ordering
       
         const quizItems = quizes
           .filter(item => item.group_name === group)
-          .map(({ ordering, ...rest }) => rest); // remove ordering
+          .map(({ ordering, id, ...rest }) => rest); // remove ordering
       
         const summaryItems = summaries
           .filter(item => item.group_name === group)
-          .map(({ ordering, ...rest }) => rest); // remove ordering
+          .map(({ ordering, id, ...rest }) => rest); // remove ordering
       
         return {
           group_name: group,
@@ -157,72 +157,48 @@ export const getOrders = createAsyncThunk(
       let quizes = [];
       let totalModule = 0;
       let totalCompletedModule = 0;
+      let groupedData = [];
       if (data[0]?.order_id) {
         let orderLessons = [];
         if (order_id != null && columnName != null) {
           const lessons = await retrieveData('order_lessons', data[0].order_id, "order_id");
           lessons.sort((a, b) => a.ordering - b.ordering);
-          lessons.forEach((lesson) => {
-            if (lesson.type === "pre-test" && lesson.no === '1') {
-              pretestId = lesson.id
-            }
-            if (lesson.type === "quiz" && lesson.no === '1') {
-              quizes.push(lesson.id)
-            }
-            if (lesson.type === "video") {
-              totalModule++;
-              if (lesson.complete) totalCompletedModule++;
-            }
-          })
-          const groupedLessons = lessons.reduce((acc, lesson) => {
-            if (lesson.type === "video") {
-              const groupName = lesson.group_name || "Ungrouped";
-    
-              if (!acc[groupName]) {
-                acc[groupName] = [];
-              }
-      
-              acc[groupName].push(lesson); // simpan seluruh objek lesson
-            }
-            return acc;
-          }, {});
+          const groupNames = [...new Set(lessons.map(item => item.group_name))];
 
-          let i = 0;
-          let ordering = 0;
-          orderLessons = Object.entries(groupedLessons).map(([groupName, lessons]) => {
-            ordering += lessons.length+1
-            const resume = {
-              id:order_id.slice(0, 4)+i,
-              lesson_id: 'rsm'+i,
-              name: groupName,
-              type: 'rangkuman',
-              group_name: groupName,
-              ordering: ordering
-            }
-            ordering++;
-            const extraItem = {
-              id:quizes[i],
-              lesson_id: quizes[i],
-              name: groupName,
-              type: 'quiz',
-              group_name: groupName,
-              ordering: ordering
-            }
-            i++;
+          groupedData = groupNames.map(group => {
+            const itemsInGroup = lessons.filter(item => item.group_name === group);
+
+            const pretest = itemsInGroup.find(item => item.type === 'pre-test');
+            const quiz = itemsInGroup.find(item => item.type === 'quiz');
+            const summary = itemsInGroup.find(item => item.type === 'rangkuman');
+            const others = itemsInGroup.filter(item => 
+              item.type !== 'pre-test' && item.type !== 'quiz' && item.type !== 'rangkuman'
+            );
+
+            const finalItems = [
+              ...(pretest ? [pretest] : []),
+              ...others,
+              ...(summary ? [summary] : []),
+              ...(quiz ? [quiz] : []),
+            ];
 
             return {
-              title: groupName,
-              lessons: [...lessons,resume,extraItem],
-            }
+              title: group,
+              lessons: finalItems
+            };
           });
         }
+        pretestId = groupedData[0]?.lessons[0]?.id;
+        groupedData.shift();
+        console.log(groupedData);
+        
         data[0].pretestId = pretestId
         data[0].totalModule = totalModule
         data[0].totalCompletedModule = totalCompletedModule
         data[0].progress = (totalCompletedModule / totalModule) * 100  
         return {
           orderData: data,
-          orderLessons: orderLessons
+          orderLessons: groupedData
         } 
       }
     } catch (error) {
