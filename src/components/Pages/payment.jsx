@@ -22,7 +22,7 @@ const PaymentPage = () => {
     const { orderData } = useOrder(null,id,"order_id");
     const class_id = orderData[0]?.class_id;
     const { classFacilities } = useClass("",class_id);
-    const { updateOrder, status } = useOrder();
+    const { paidOrder, status } = useOrder();
 
     useEffect(() => {
         if(token === null) {
@@ -41,7 +41,7 @@ const PaymentPage = () => {
             alert("Pilih Metode Pembayaran");
             return false;
         }
-        updateOrder(orderData[0]?.id,{ status:"success", paid_at: new Date().toISOString() });
+        paidOrder(orderData[0]?.id);
     };
 
     useEffect(() => {

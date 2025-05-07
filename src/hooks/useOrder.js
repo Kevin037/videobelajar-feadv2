@@ -1,6 +1,6 @@
 // hooks/useUser.js
 import { useDispatch, useSelector } from 'react-redux';
-import { createOrderThunk, createReviewThunk, fetchTestResult, getOrderById, getOrders, updateOrderThunk } from '../services/api/orderSlice';
+import { createOrderThunk, createReviewThunk, fetchTestResult, getOrderById, getOrders, paidOrderThunk, updateOrderThunk } from '../services/api/orderSlice';
 import { useEffect } from 'react';
 
 const useOrder = (id=null,order_id=null, columnName=null, user_id = null, testId = null) => {
@@ -19,6 +19,10 @@ const useOrder = (id=null,order_id=null, columnName=null, user_id = null, testId
     dispatch(updateOrderThunk({id,orderData}));
   };
 
+  const paidOrder = (id) => {
+    dispatch(paidOrderThunk(id));
+  };
+
     useEffect(() => {
       if (testId) {
         console.log(testId);
@@ -33,7 +37,7 @@ const useOrder = (id=null,order_id=null, columnName=null, user_id = null, testId
       }
     }, [dispatch,order_id]);
 
-  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status, orderLessons, createReview, resultData };
+  return { currentOrder, loading, error, createOrder, orderData, updateOrder, status, orderLessons, createReview, resultData, paidOrder };
 };
 
 export default useOrder;

@@ -220,8 +220,7 @@ function buildFirestoreFields(data) {
     const body = {
       fields: buildFirestoreFields(data),
     };
-  
-    const response = await api.post(endpoint, body);
+    const response = (customId) ? await api.patch(endpoint, body) : await api.post(endpoint, body);
     return response.data;
   }
 

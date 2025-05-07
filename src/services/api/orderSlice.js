@@ -18,19 +18,6 @@ export const createOrderThunk = createAsyncThunk(
       const res = await store(orderData,'orders');
       if (res?.fields) {
         const order = parseFirestoreFields(res.fields);
-        const lessons = await retrieveData('lessons', order.class_id, "class_id");
-          for (let i = 0; i < lessons.length; i++) {
-            await store({ 
-              order_id: order.order_id,
-              class_id: lessons[i].class_id,
-              lesson_id: lessons[i].id,
-              duration: lessons[i].duration,
-              group_name: lessons[i].group_name,
-              ordering: lessons[i].ordering,
-              name: lessons[i].name,
-              type: lessons[i].type
-            },'order_lessons');
-          }
         return order;
       }
     } catch (error) {
@@ -66,6 +53,95 @@ export const updateOrderThunk = createAsyncThunk(
     try {
       const res = await update(orderData,'orders',id);
       return res; // res berisi data document baru dari Firestore
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const paidOrderThunk = createAsyncThunk(
+  'order/paid',
+  async (id, thunkAPI) => {
+    try {
+      const paidData = { status:"success", paid_at: new Date().toISOString() }
+      const orderRaw = await getDataById(id,'orders');
+      const order = parseFirestoreFields(orderRaw.fields);
+      const pretestsRaw = await retrieveData('pretests');
+      const pretests = pretestsRaw.map(item => ({
+        ...item,
+        type: 'pre-test'
+      }));
+      pretests.sort((a, b) => a.no - b.no);
+      const lessonsRaw = await retrieveData('lessons');
+      const lessons = lessonsRaw.map(item => ({
+        ...item,
+        type: 'video'
+      }));
+      lessons.sort((a, b) => a.ordering - b.ordering);
+      const quizesRaw = await retrieveData('materials',"quiz","type");
+      const quizes = quizesRaw.map(item => ({
+        ...item,
+        type: 'quiz'
+      }));
+      quizes.sort((a, b) => a.no - b.no);
+      const summariesRaw = await retrieveData('materials',"rangkuman","type");
+      const summaries = summariesRaw.map(item => ({
+        ...item,
+        type: 'rangkuman'
+      }));
+
+      const groupNames = [
+        ...new Set([...lessons.map(l => l.group_name), ...quizes.map(m => m.group_name), ...summaries.map(s => s.group_name)])
+      ];
+
+      const groupedData = groupNames.map(group => {
+        const lessonItems = lessons
+          .filter(item => item.group_name === group)
+          .map(({ ordering, ...rest }) => rest); // remove ordering
+      
+        const quizItems = quizes
+          .filter(item => item.group_name === group)
+          .map(({ ordering, ...rest }) => rest); // remove ordering
+      
+        const summaryItems = summaries
+          .filter(item => item.group_name === group)
+          .map(({ ordering, ...rest }) => rest); // remove ordering
+      
+        return {
+          group_name: group,
+          items: [...lessonItems, ...summaryItems, ...quizItems]
+        };
+      });
+      
+      
+      let template_no = order.order_id.slice(0, 4);
+      let no = "";
+      let new_ordering = 0;
+      
+      for (let i = 0; i < pretests.length; i++) {
+        no = template_no+new_ordering;
+        await store({
+          order_id: order.order_id,
+          class_id: order.class_id,
+          ordering: new_ordering,
+          ...pretests[i],
+        },'order_lessons',no);
+        new_ordering++;
+      }
+      for (let x = 0; x < groupedData.length; x++) {
+        for (let i = 0; i < groupedData[x].items.length; i++) {
+          no = template_no+new_ordering;
+          await store({
+            order_id: order.order_id,
+            class_id: order.class_id,
+            ordering: new_ordering,
+            ...groupedData[x].items[i],
+          },'order_lessons',no);
+          new_ordering++;
+        }
+      }
+      const res = await update(paidData,'orders',id);
+      return res;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -301,6 +377,18 @@ const orderSlice = createSlice({
       .addCase(fetchTestResult.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(paidOrderThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(paidOrderThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.status = action.payload; // data user baru dari Firestore
+      })
+      .addCase(paidOrderThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       })
   },
 });
