@@ -154,12 +154,10 @@ export const getOrders = createAsyncThunk(
     try {
       const data = await retrieveData('orders', order_id, columnName,user_id);
       let pretestId = null;
-      let quizes = [];
       let totalModule = 0;
       let totalCompletedModule = 0;
       let groupedData = [];
       if (data[0]?.order_id) {
-        let orderLessons = [];
         if (order_id != null && columnName != null) {
           const lessons = await retrieveData('order_lessons', data[0].order_id, "order_id");
           lessons.sort((a, b) => a.ordering - b.ordering);
@@ -187,10 +185,13 @@ export const getOrders = createAsyncThunk(
               lessons: finalItems
             };
           });
+          lessons.forEach(lesson => {
+            if (lesson.type === 'video') totalModule++;
+            if (lesson.type === 'video' && lesson.complete) totalCompletedModule++;
+          });
         }
         pretestId = groupedData[0]?.lessons[0]?.id;
         groupedData.shift();
-        console.log(groupedData);
         
         data[0].pretestId = pretestId
         data[0].totalModule = totalModule
